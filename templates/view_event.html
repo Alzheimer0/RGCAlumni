@@ -1,0 +1,39 @@
+<!-- ./templates/view_event.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-primary text-center">Event Details</h2>
+    <div class="card shadow-lg p-4">
+        
+        <!-- Event Details -->
+        <h2 class="mt-3 mb-4 text-primary">{{ event.title }}</h2>
+
+        <!-- Event Info -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>Date:</strong> {{ event.date }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Location:</strong> {{ event.location }}</p>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <p><strong>Description:</strong></p>
+            <p class="text-muted">{{ event.description }}</p>
+        </div>
+
+        <!-- Edit Button (Visible only if the user posted the event) -->
+        {% if event.posted_by == current_user.username %}
+        <div class="card-footer d-flex justify-content-end">
+            <a tabindex="0" href="{{ url_for('edit_event', event_id=event._id) }}" class="btn btn-warning mb-3">Edit Event</a>
+            <a tabindex="0" href="{{ url_for('delete_event', event_id=event._id) }}" class="btn btn-danger mb-3" onclick="return confirmDelete()">Delete Event</a>
+        </div>
+        {% endif %}
+        
+        <!-- Optional RSVP Button (Currently Commented) -->
+        <!-- <a tabindex="0" href="{{ url_for('rsvp_event', event_id=event._id) }}" class="btn btn-primary">RSVP</a> -->
+    </div>
+</div>
+{% endblock %}

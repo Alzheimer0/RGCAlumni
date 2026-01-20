@@ -1,0 +1,14 @@
+<!-- ./templates/generate_reports.html -->
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Generated Reports</h2>
+    <ul class="list-group">
+        {% for report in reports %}
+        <li class="list-group-item">{{ report }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

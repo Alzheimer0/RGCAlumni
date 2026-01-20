@@ -1,0 +1,39 @@
+ 
+ 
+ <!-- ./templates/create_profile.html -->
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-primary text-center">Create Your RGCACS Alumni Profile</h1>
+    <p class="text-center text-muted mb-4">Join the Rajiv Gandhi College Alumni Network</p>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <form action="{{ url_for('create_profile') }}" method="POST" class="profile-form">
+                <div class="mb-3">
+                    <label class="form-label" for="name">Name:</label>
+                    <input class="form-control" tabindex="0" type="text" id="name" name="name" placeholder="Enter Name" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="bio">Bio:</label>
+                    <textarea class="form-control" tabindex="0" id="bio" name="bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="graduation_year">Graduation Year:</label>
+                    <input class="form-control" tabindex="0" type="text" id="graduation_year" name="graduation_year" pattern="[0-9]+" placeholder="Enter Graduation Year" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="industry">Industry:</label>
+                    <input class="form-control" tabindex="0" type="text" id="industry" name="industry" placeholder="Enter Industry Name" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="contact_details">Contact Details:</label>
+                    <textarea class="form-control" tabindex="0" id="contact_details" name="contact_details" placeholder="Enter Contact Details" required></textarea>
+                </div>
+                <button class="btn btn-primary" tabindex="0" type="submit">Create RGCACS Profile</button>
+            </form>
+        </div>
+    </div>  
+</div>
+{% endblock %}

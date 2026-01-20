@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}Edit Profile - Rajiv Gandhi Alumini Network{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center text-primary">Edit Your Profile</h2>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <form action="{{ url_for('edit_profile', alumni_id=alumni._id) }}" method="POST" class="profile-form">
+                <div class="mb-3">
+                    <label class="form-label" for="name">Name:</label>
+                    <input class="form-control" tabindex="0" type="text" id="name" name="name" value="{{ alumni.name }}" placeholder="Enter your name" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label" for="bio">Bio:</label>
+                    <textarea class="form-control" tabindex="0" id="bio" name="bio" rows="3" placeholder="Tell us about yourself...">{{ alumni.bio if alumni.bio else '' }}</textarea>
+                </div>
+        
+                <div class="mb-3">
+                    <label class="form-label" for="graduation_year">Graduation Year:</label>
+                    <input class="form-control" tabindex="0" type="text" id="graduation_year" pattern="[0-9]+" name="graduation_year" value="{{ alumni.graduation_year }}" placeholder="Enter your graduation year" required>
+                </div>
+        
+                <div class="mb-3">
+                    <label class="form-label" for="industry">Industry:</label>
+                    <input class="form-control" tabindex="0" type="text" id="industry" name="industry" value="{{ alumni.industry }}" placeholder="Enter your industry" required>
+                </div>
+        
+                <div class="mb-3">
+                    <label class="form-label" for="contact_details">Contact Details:</label>
+                    <textarea class="form-control" tabindex="0" id="contact_details" name="contact_details" placeholder="Enter your contact details" required>{{ alumni.contact_details }}</textarea>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-primary" tabindex="0" type="submit">Update Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

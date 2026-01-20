@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Heading -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-primary text-center mb-4">Create New Event</h2>
+        </div>
+    </div>
+
+    <!-- Form Section -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <!-- <div class="card shadow-sm p-4"> -->
+                <form action="/create_event" method="post">
+                    <!-- Title Field -->
+                    <div class="mb-3">
+                        <label class="form-label" for="title">Title:</label>
+                        <input class="form-control" tabindex="0" type="text" id="title" name="title" placeholder="Enter Title" required>
+                    </div>
+
+                    <!-- Date Field -->
+                    <div class="mb-3">
+                        <label class="form-label" for="date">Date:</label>
+                        <input class="form-control" tabindex="0" type="date" id="date" name="date" value="{{ current_date }}" required>
+                    </div>
+
+                    <!-- Location Field -->
+                    <div class="mb-3">
+                        <label class="form-label" for="location">Location:</label>
+                        <input class="form-control" tabindex="0" type="text" id="location" name="location" placeholder="Enter Location" required>
+                    </div>
+
+                    <!-- Description Field -->
+                    <div class="mb-3">
+                        <label class="form-label" for="description">Description:</label>
+                        <textarea class="form-control" tabindex="0" id="description" name="description" rows="4" placeholder="Enter Description" required></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        <button class="btn btn-primary btn-lg" tabindex="0" type="submit">Create Event</button>
+                    </div>
+                </form>
+            <!-- </div> -->
+        </div>
+    </div>
+</div>
+{% endblock %}

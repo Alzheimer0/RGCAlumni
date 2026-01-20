@@ -1,0 +1,54 @@
+<!-- ./templates/mentorships.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold"><i class="fas fa-user-graduate icon"></i> Mentorship Opportunities</h1>
+        <a tabindex="0" class="btn btn-primary mb-3" href="{{ url_for('admin_create_mentorship') }}">Post a New Mentorship</a>
+    </div>
+    
+
+    <section class="mb-5">
+    {% if user_mentorships %}
+        <h2 class="text-primary">Your Mentorship Posts</h2>
+        <ul class="list-group">
+            {% for mentorship in user_mentorships %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <h4><a tabindex="0" href="{{ url_for('view_mentorship', mentorship_id=mentorship._id) }}" class="text-decoration-none text-primary ">{{ mentorship.mentor_name }} mentors {{ mentorship.mentee_name }}</a></h4>
+                    <div class="text-muted">
+                        <p><strong>Contact Info:</strong>{{ mentorship.contact_info }}</p>
+                        <p><strong>Posted By:</strong>{{ mentorship.posted_by }}</p>
+                    </div>
+                </div>
+                <div>
+                    <a tabindex="0" href="{{ url_for('view_mentorship', mentorship_id=mentorship._id) }}" class="btn btn-primary btn-sm me-2">View</a>
+                    <a tabindex="0" href="{{ url_for('admin_edit_mentorship', mentorship_id=mentorship._id) }}" class="btn btn-warning btn-sm me-2">Edit</a>
+                    <a tabindex="0" href="{{ url_for('admin_delete_mentorship', mentorship_id=mentorship._id) }}" class="btn btn-danger btn-sm me-2" onclick="return confirmDelete()">Delete</a>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+    <section>
+        <h2 class="text-primary">All Mentorship Posts</h2>
+        <ul class="list-group">
+        {% for mentorship in mentorships %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4><a tabindex="0" href="{{ url_for('view_mentorship', mentorship_id=mentorship._id) }}" class="text-decoration-none text-primary ">{{ mentorship.mentor_name }} mentors {{ mentorship.mentee_name }}</a></h4>
+                        <div class="text-muted">
+                            <p><strong>Contact Info:</strong>{{ mentorship.contact_info }}</p>
+                            <p><strong>Posted By:</strong>{{ mentorship.posted_by }}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <a tabindex="0" href="{{ url_for('view_mentorship', mentorship_id=mentorship._id) }}" class="btn btn-primary btn-sm me-2">View</a>
+                    </div>
+                </li>
+        {% endfor %}
+        </ul>
+    </section>
+{% endblock %}

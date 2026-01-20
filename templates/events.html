@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Header with Title and Create Event Button -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold"><i class="fas fa-calendar-alt icon"></i> EVENTS</h1>
+        <a tabindex="0" href="{{ url_for('admin_create_event') }}" class="btn btn-primary">Create New Event</a>
+    </div>
+
+    <!-- Posted Events Section -->
+    {% if user_events %}
+    <section class="mb-5">
+        <h2 class="text-primary">Your Posted Events</h2>
+        <div class="row">
+            {% for event in user_events %}
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <a href="{{ url_for('view_event', event_id=event._id) }}" class="list-group-item list-group-item-action">
+                        <div class="card-body">
+                            <h3 class="card-title text-primary">{{ event.title }}</h3>
+                            <p class="card-text"><strong>Date:</strong> {{ event.date }}</p>
+                            <p class="card-text"><strong>Location:</strong> {{ event.location }}</p>
+                            <p class="card-text"><strong>Description:</strong> {{ event.description }}</p>
+                            <p class="text-muted"><strong>Posted By:</strong> {{ event.posted_by }}</p>
+                        </div>
+                    </a>
+                    <div class="card-footer d-flex justify-content-end">
+                        <a tabindex="0" href="{{ url_for('view_event', event_id=event._id) }}" class="btn btn-primary btn-sm me-2">View</a>
+                        <a tabindex="0" href="{{ url_for('admin_edit_event', event_id=event._id) }}" class="btn btn-warning btn-sm me-2">Edit</a>
+                        <a tabindex="0" href="{{ url_for('admin_delete_event', event_id=event._id) }}" class="btn btn-danger btn-sm me-2" onclick="return confirmDelete()">Delete</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- All Events Section -->
+    <section>
+        <h2 class="text-primary">All Events</h2>
+        <div class="row">
+            {% for event in events %}
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <a href="{{ url_for('view_event', event_id=event._id) }}" class="list-group-item list-group-item-action">
+                        <div class="card-body">
+                            <h3 class="card-title text-primary">{{ event.title }}</h3>
+                            <p class="card-text"><strong>Date:</strong> {{ event.date }}</p>
+                            <p class="card-text"><strong>Location:</strong> {{ event.location }}</p>
+                            <p class="card-text"><strong>Description:</strong> {{ event.description }}</p>
+                            <p class="text-muted"><strong>Posted By:</strong> {{ event.posted_by }}</p>
+                        </div>
+                    </a>
+                    <div class="card-footer d-flex justify-content-end">
+                        <a tabindex="0" href="{{ url_for('view_event', event_id=event._id) }}" class="btn btn-primary btn-sm me-2">View</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

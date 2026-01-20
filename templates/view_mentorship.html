@@ -1,0 +1,29 @@
+<!-- ./templates/view_mentorship.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-primary text-center">Mentorship Details</h2>
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <h5 class="card-title">Mentor & Mentee Information</h5>
+            <p><strong>Mentor Name:</strong> {{ mentorship.mentor_name }}</p>
+            <p><strong>Mentee Name:</strong> {{ mentorship.mentee_name }}</p>
+
+            <hr>
+
+            <h5 class="card-title">Mentorship Details</h5>
+            <p><strong>Details:</strong> {{ mentorship.details }}</p>
+            <p><strong>Contact Info:</strong> {{ mentorship.contact_info }}</p>
+
+            <!-- Edit Button (Visible only if the user is the mentor) -->
+            {% if mentorship.posted_by == current_user.username %}
+            <div class="card-footer d-flex justify-content-end">
+                <a tabindex="0" href="{{ url_for('edit_mentorship', mentorship_id=mentorship._id) }}" class="btn btn-warning me-3">Edit </a>
+                <a tabindex="0" href="{{ url_for('delete_mentorship', mentorship_id=mentorship._id) }}" class="btn btn-danger" onclick="return confirmDelete()">Delete</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

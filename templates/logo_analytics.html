@@ -1,0 +1,293 @@
+<!-- ./templates/logo_analytics.html -->
+{% extends "layout.html" %}
+
+{% block title %}Logo Analytics - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h2 class="mb-0"><i class="fas fa-chart-line"></i> Logo Analytics Dashboard</h2>
+                </div>
+                <div class="card-body">
+                    <!-- Summary Statistics -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <h3 class="card-title">{{ analytics.total_switches or 0 }}</h3>
+                                    <p class="card-text">Total Logo Switches</p>
+                                    <i class="fas fa-exchange-alt fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h3 class="card-title">
+                                        {% set to_secondary_count = 0 %}
+                                        {% for stat in analytics.switch_stats %}
+                                            {% if stat._id == 'to_secondary' %}
+                                                {% set to_secondary_count = stat.count %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {{ to_secondary_count }}
+                                    </h3>
+                                    <p class="card-text">To Alumni Logo</p>
+                                    <i class="fas fa-user-graduate fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <h3 class="card-title">
+                                        {% set to_primary_count = 0 %}
+                                        {% for stat in analytics.switch_stats %}
+                                            {% if stat._id == 'to_primary' %}
+                                                {% set to_primary_count = stat.count %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {{ to_primary_count }}
+                                    </h3>
+                                    <p class="card-text">To College Logo</p>
+                                    <i class="fas fa-university fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body text-center">
+                                    <h3 class="card-title">
+                                        {% if analytics.recent_activity %}
+                                            {{ analytics.recent_activity|length }}
+                                        {% else %}
+                                            0
+                                        {% endif %}
+                                    </h3>
+                                    <p class="card-text">Recent Activities</p>
+                                    <i class="fas fa-clock fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Switch Statistics Chart -->
+                    {% if analytics.switch_stats %}
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-chart-pie"></i> Logo Switch Distribution</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="switchChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-chart-bar"></i> Switch Statistics</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Switch Type</th>
+                                                    <th>Count</th>
+                                                    <th>Percentage</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for stat in analytics.switch_stats %}
+                                                <tr>
+                                                    <td>
+                                                        {% if stat._id == 'to_primary' %}
+                                                            <i class="fas fa-university text-warning"></i> To College Logo
+                                                        {% elif stat._id == 'to_secondary' %}
+                                                            <i class="fas fa-user-graduate text-success"></i> To Alumni Logo
+                                                        {% else %}
+                                                            <i class="fas fa-question text-muted"></i> {{ stat._id.title() }}
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ stat.count }}</td>
+                                                    <td>
+                                                        {% set percentage = (stat.count / analytics.total_switches * 100) if analytics.total_switches > 0 else 0 %}
+                                                        {{ "%.1f"|format(percentage) }}%
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Recent Activity -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-history"></i> Recent Logo Switch Activity</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if analytics.recent_activity %}
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>Timestamp</th>
+                                                    <th>Switch Type</th>
+                                                    <th>User</th>
+                                                    <th>IP Address</th>
+                                                    <th>User Agent</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for activity in analytics.recent_activity %}
+                                                <tr>
+                                                    <td>
+                                                        {% if activity.timestamp %}
+                                                            {{ activity.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+                                                        {% else %}
+                                                            N/A
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if activity.switch_type == 'to_primary' %}
+                                                            <span class="badge bg-warning"><i class="fas fa-university"></i> To College</span>
+                                                        {% elif activity.switch_type == 'to_secondary' %}
+                                                            <span class="badge bg-success"><i class="fas fa-user-graduate"></i> To Alumni</span>
+                                                        {% else %}
+                                                            <span class="badge bg-secondary">{{ activity.switch_type }}</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if activity.username %}
+                                                            <i class="fas fa-user"></i> {{ activity.username }}
+                                                        {% else %}
+                                                            <i class="fas fa-user-secret text-muted"></i> Anonymous
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <code>{{ activity.ip_address or 'N/A' }}</code>
+                                                    </td>
+                                                    <td>
+                                                        <small class="text-muted">
+                                                            {{ (activity.user_agent[:50] + '...') if activity.user_agent and activity.user_agent|length > 50 else (activity.user_agent or 'N/A') }}
+                                                        </small>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle"></i> No logo switch activity recorded yet.
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Back to Admin -->
+                    <div class="mt-4">
+                        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Admin Dashboard
+                        </a>
+                        <a href="{{ url_for('admin_logo_upload') }}" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Manage Logos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js for analytics visualization -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if analytics.switch_stats %}
+    // Prepare data for the chart
+    const switchData = {
+        labels: [
+            {% for stat in analytics.switch_stats %}
+                {% if stat._id == 'to_primary' %}
+                    'To College Logo',
+                {% elif stat._id == 'to_secondary' %}
+                    'To Alumni Logo',
+                {% else %}
+                    '{{ stat._id.title() }}',
+                {% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            data: [
+                {% for stat in analytics.switch_stats %}
+                    {{ stat.count }},
+                {% endfor %}
+            ],
+            backgroundColor: [
+                {% for stat in analytics.switch_stats %}
+                    {% if stat._id == 'to_primary' %}
+                        '#ffc107',
+                    {% elif stat._id == 'to_secondary' %}
+                        '#28a745',
+                    {% else %}
+                        '#6c757d',
+                    {% endif %}
+                {% endfor %}
+            ],
+            borderColor: [
+                {% for stat in analytics.switch_stats %}
+                    {% if stat._id == 'to_primary' %}
+                        '#e0a800',
+                    {% elif stat._id == 'to_secondary' %}
+                        '#1e7e34',
+                    {% else %}
+                        '#495057',
+                    {% endif %}
+                {% endfor %}
+            ],
+            borderWidth: 2
+        }]
+    };
+
+    // Create the chart
+    const ctx = document.getElementById('switchChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: switchData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+});
+</script>
+{% endblock %}

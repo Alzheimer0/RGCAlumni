@@ -1,0 +1,228 @@
+<!-- ./templates/login.html -->
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="login-card">
+                <div class="login-header">
+                    <h2 class="login-title">
+                        <i class="fas fa-university"></i> RGCACS Alumni Login
+                    </h2>
+                    <p class="login-subtitle">Rajiv Gandhi College of Arts, Commerce & Science</p>
+                </div>
+                
+                <!-- Admin Login Instructions -->
+                <div class="admin-login-info">
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-user-shield"></i> Admin Login Information</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Username:</strong> admin<br>
+                                <strong>Email:</strong> alzheimer085@gmail.com<br>
+                                <strong>Password:</strong> admin123
+                            </div>
+                            <div class="col-md-6">
+                                <small>If admin account doesn't exist:</small><br>
+                                <a href="{{ url_for('create_admin_now') }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                    <i class="fas fa-plus"></i> Create Admin Account
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST" class="login-form">
+                    <div class="mb-3">
+                        <label class="form-label" for="username">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <input class="form-control form-control-lg" 
+                               type="text" 
+                               id="username" 
+                               name="username" 
+                               placeholder="Enter your username" 
+                               required
+                               autocomplete="username">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label" for="password">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <div class="password-input-wrapper">
+                            <input class="form-control form-control-lg" 
+                                   type="password" 
+                                   id="password" 
+                                   name="password" 
+                                   placeholder="Enter your password" 
+                                   required
+                                   autocomplete="current-password">
+                            <button type="button" class="password-toggle" onclick="togglePassword()">
+                                <i class="fas fa-eye" id="password-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="login-actions">
+                        <button class="btn btn-primary btn-lg btn-login" type="submit">
+                            <i class="fas fa-sign-in-alt"></i> Login to Portal
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="login-footer">
+                    <p>Don't have an account? 
+                        <a href="{{ url_for('register') }}">Register as Alumni</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const passwordIcon = document.getElementById('password-icon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passwordIcon.className = 'fas fa-eye-slash';
+    } else {
+        passwordInput.type = 'password';
+        passwordIcon.className = 'fas fa-eye';
+    }
+}
+
+// Auto-fill admin credentials when clicking the admin info
+document.addEventListener('DOMContentLoaded', function() {
+    const adminInfo = document.querySelector('.admin-login-info');
+    if (adminInfo) {
+        adminInfo.addEventListener('click', function() {
+            if (confirm('Auto-fill admin credentials?')) {
+                document.getElementById('username').value = 'admin';
+                document.getElementById('password').value = 'admin123';
+            }
+        });
+    }
+});
+</script>
+
+<style>
+.login-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-top: 2rem;
+}
+
+.login-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.login-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+    opacity: 0.9;
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+.admin-login-info {
+    padding: 1.5rem 2rem 0;
+    cursor: pointer;
+}
+
+.admin-login-info .alert {
+    border-radius: 12px;
+    border: none;
+    background: rgba(23, 162, 184, 0.1);
+    border-left: 4px solid #17a2b8;
+}
+
+.login-form {
+    padding: 2rem;
+}
+
+.form-control-lg {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.form-control-lg:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.password-input-wrapper {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.password-toggle:hover {
+    color: #495057;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.login-footer {
+    text-align: center;
+    padding: 0 2rem 2rem;
+    color: #6c757d;
+}
+
+.login-footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-footer a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .login-title {
+        font-size: 1.5rem;
+    }
+    
+    .login-form {
+        padding: 1.5rem;
+    }
+}
+</style>
+{% endblock %}

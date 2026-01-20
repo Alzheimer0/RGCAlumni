@@ -1,0 +1,37 @@
+<!-- ./templates/edit_event.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center text-primary">Edit Event</h2>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <form method="post">
+                <div class="mb-3">
+                    <label class="form-label" for="title">Title:</label>
+                    <input class="form-control" tabindex="0" type="text" id="title" name="title" value="{{ event.title }}" placeholder="Enter Title" required><br>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="date">Date:</label>
+                    <input class="form-control" tabindex="0" type="date" id="date" name="date" value="{{ current_date }}" placeholder="Enter Date" required><br>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="location">Location:</label>
+                    <input class="form-control" tabindex="0" type="text" id="location" name="location" value="{{ event.location }}" placeholder="Enter Location" required><br>   
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="description">Description:</label>
+                    <textarea class="form-control" tabindex="0" id="description" name="description" placeholder="Enter Description" required>{{ event.description }}</textarea><br>
+                </div>
+                <!-- <div class="mb-3"></div>
+                    <label class="form-label" for="posted_by">Posted By:</label>
+                    <input class="form-control" tabindex="0" type="text" id="posted_by" name="posted" placeholder="Enter Name" required><br>
+                </div> -->
+                <div class="text-center">
+                    <button class="btn btn-primary" tabindex="0" type="submit">Update Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

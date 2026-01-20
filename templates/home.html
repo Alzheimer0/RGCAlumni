@@ -1,0 +1,141 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Jumbotron Section -->
+    <section class="bg-light text-center p-5 mb-5 rounded">
+        <h1 class="display-4 text-primary">Rajiv Gandhi Alumini Network</h1>
+        <p class="lead text-primary"><strong>Rajiv Gandhi College of Arts, Commerce & Science</strong></p>
+        <p class="lead text-muted">Connect, Share, and Grow with your Alumni Network.</p>
+        {% if current_user.is_authenticated %}
+            <p class="text-success">Hello, {{ current_user.username }}! Welcome back to our alumni community.</p>
+        {% else %}
+            <div class="d-flex justify-content-center">
+                <a href="{{ url_for('register') }}" class="btn btn-primary me-2">Join Alumni Network</a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-secondary">Alumni Login</a>
+            </div>
+        {% endif %}
+    </section>
+
+    <!-- Official Logo Announcement -->
+    <section class="mb-5">
+        <div class="alert alert-info border-info" style="background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); border-left: 5px solid #17a2b8;">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <img src="{{ url_for('static', filename='image/RGC.jpeg') }}" 
+                         alt="Official RGCACS Logo" 
+                         class="img-fluid" 
+                         style="max-height: 80px; border-radius: 10px; background: white; padding: 5px;">
+                </div>
+                <div class="col-md-10">
+                    <h5 class="alert-heading mb-2 text-info">
+                        <i class="fas fa-university"></i> Official College Branding Now Active
+                    </h5>
+                    <p class="mb-1">We're proud to display the official <strong>Rajiv Gandhi College of Arts, Commerce & Science</strong> logo with our institutional motto <em>"Trust Transforms Life"</em>. This authentic branding represents our college's commitment to excellence in education and character development.</p>
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i> Click the logo toggle button (⇄) in the navigation to switch between college and alumni logos.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Notifications Section -->
+    {% if notifications %}
+    <section class="mb-5">
+        <h2 class="text-primary mb-4">New Notifications</h2>
+        <ul class="list-group">
+            {% for notification in notifications %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-dark fw-bold">{{ notification.message }}</p>
+                        <small class="text-muted">Sent by {{ notification.created_by }} on {{ notification.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                    </div>
+                    {% if (datetime.utcnow() - notification.created_at).days < 2 %}
+                    <span class="badge bg-danger">New</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    <!-- Upcoming Events Section -->
+    {% if upcoming_events %}
+    <section class="mb-5">
+        <h2 class="text-primary mb-4">Upcoming Events</h2>
+        <div class="row">
+            {% for event in upcoming_events %}
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <a href="{{ url_for('view_event', event_id=event._id) }}" class="list-group-item list-group-item-action">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ event.title }}</h5>
+                                <p class="card-text"><strong>Date:</strong> {{ event.date.strftime('%B %d, %Y') }} | <strong>Location:</strong> {{ event.location }}</p>
+                                <p class="card-text">{{ event.description }}</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Recent Discussions Section -->
+    {% if recent_discussions %}
+    <section class="mb-5">
+        <h2 class="text-primary mb-4">Discussions</h2>
+        <ul class="list-group">
+            {% for discussion in recent_discussions %}
+            <li class="d-flex justify-content-between align-items-center">
+                <a href="{{ url_for('view_discussion', discussion_id=discussion._id) }}" class="list-group-item list-group-item-action">
+                    <h5 class="text-primary">{{ discussion.topic }}</h5>
+                    <p class="mb-1">by <strong>{{ discussion.author }}</strong> in <strong>{{ discussion.category }}</strong></p>
+                    <p>{{ discussion.content }}</p>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    <!-- Job Postings Section -->
+    {% if job_posts %}
+    <section class="mb-5">
+        <h2 class="text-primary mb-4">Job Postings</h2>
+        <div class="row">
+            {% for job in job_posts %}
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <a href="{{ url_for('view_job', job_id=job._id) }}" class="list-group-item list-group-item-action">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ job.title }}</h5>
+                                <p class="card-text">By <strong>{{ job.company }}</strong> at <strong>{{ job.location }}</strong></p>
+                                <p class="card-text">{{ job.description }}</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Mentorship Opportunities Section -->
+    {% if mentorships %}
+    <section class="mb-5">
+        <h2 class="text-primary mb-4">Mentorship Opportunities</h2>
+        <div class="list-group">
+            {% for mentorship in mentorships %}
+                <a href="{{ url_for('view_mentorship', mentorship_id=mentorship._id) }}" class="list-group-item list-group-item-action">
+                    <h5 class="text-primary">{{ mentorship.mentor_name }} mentoring {{ mentorship.mentee_name }}</h5>
+                    <p>{{ mentorship.details }}</p>
+                    <p><strong>Contact:</strong> {{ mentorship.contact_info }}</p>
+                </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

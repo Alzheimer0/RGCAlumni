@@ -1,0 +1,31 @@
+<!-- ./templates/create_mentorship.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center text-primary">Post a New Mentorship</h2>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <form method="post">
+                <div class="mb-3">
+                    <label class="form-label" for="mentor_name">Mentor Name:</label>
+                    <input class="form-control" tabindex="0"  type="text" id="mentor_name" name="mentor_name" placeholder="Enter Mentor Name" required><br>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="mentee_name">Mentee Name:</label>
+                    <input class="form-control" tabindex="0"  type="text" id="mentee_name" name="mentee_name" placeholder="Enter Mentee Name" required><br>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="details">Details:</label>
+                    <textarea class="form-control" tabindex="0"  id="details" name="details" placeholder="Enter Details" required></textarea><br>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="contact_info">Contact Info:</label>
+                    <input class="form-control" tabindex="0"  type="text" id="contact_info" name="contact_info" placeholder="Enter Contact Info" required><br>
+                </div>
+                <button class="btn btn-primary" tabindex="0"  type="submit">Post Mentorship</button>
+            </form>
+        </div>
+    </div>  
+</div>
+{% endblock %}

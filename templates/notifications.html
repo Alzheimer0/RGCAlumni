@@ -1,0 +1,18 @@
+<!-- ./templates/notifications.html -->
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Notifications</h2>
+    <ul class="list-group">
+        {% for notification in notifications %}
+        <li class="list-group-item {% if not notification.is_read %}list-group-item-warning{% endif %}">
+            {{ notification.message }}
+            {% if not notification.is_read %}
+            <a href="{{ url_for('mark_as_read', notification_id=notification._id) }}" class="btn btn-sm btn-primary float-end">Mark as Read</a>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+

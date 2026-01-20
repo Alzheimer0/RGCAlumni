@@ -1,0 +1,250 @@
+{% extends "layout.html" %}
+
+{% block title %}Analytics Dashboard - Rajiv Gandhi Alumini Network{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-chart-bar"></i> Analytics Dashboard</h2>
+            <p class="text-muted">Comprehensive overview of your Rajiv Gandhi Alumini Network</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-2 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                    <h4 class="text-primary">{{ stats.total_users }}</h4>
+                    <p class="text-muted">Total Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-calendar-alt fa-2x text-success mb-2"></i>
+                    <h4 class="text-success">{{ stats.total_events }}</h4>
+                    <p class="text-muted">Total Events</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-comments fa-2x text-info mb-2"></i>
+                    <h4 class="text-info">{{ stats.total_discussions }}</h4>
+                    <p class="text-muted">Discussions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-briefcase fa-2x text-warning mb-2"></i>
+                    <h4 class="text-warning">{{ stats.total_jobs }}</h4>
+                    <p class="text-muted">Job Postings</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-user-graduate fa-2x text-danger mb-2"></i>
+                    <h4 class="text-danger">{{ stats.total_mentorships }}</h4>
+                    <p class="text-muted">Mentorships</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-download fa-2x text-secondary mb-2"></i>
+                    <h4 class="text-secondary">Export</h4>
+                    <p class="text-muted">Data Export</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Monthly Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <h3 class="text-success">{{ monthly_stats.events_this_month }}</h3>
+                            <p class="text-muted">Events This Month</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h3 class="text-info">{{ monthly_stats.discussions_this_month }}</h3>
+                            <p class="text-muted">Discussions This Month</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h3 class="text-warning">{{ monthly_stats.jobs_this_month }}</h3>
+                            <p class="text-muted">Jobs This Month</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h3 class="text-primary">
+                                {% if monthly_stats.events_this_month > monthly_stats.events_last_month %}
+                                    <i class="fas fa-arrow-up text-success"></i>
+                                {% elif monthly_stats.events_this_month < monthly_stats.events_last_month %}
+                                    <i class="fas fa-arrow-down text-danger"></i>
+                                {% else %}
+                                    <i class="fas fa-minus text-muted"></i>
+                                {% endif %}
+                                {{ monthly_stats.events_this_month - monthly_stats.events_last_month }}
+                            </h3>
+                            <p class="text-muted">Event Growth</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-calendar"></i> Recent Events</h5>
+                </div>
+                <div class="card-body">
+                    {% for event in stats.recent_events %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <h6 class="text-primary">{{ event.title }}</h6>
+                        <small class="text-muted">
+                            <i class="fas fa-map-marker-alt"></i> {{ event.location }}<br>
+                            <i class="fas fa-calendar"></i> {{ event.date.strftime('%Y-%m-%d') }}
+                        </small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-comments"></i> Recent Discussions</h5>
+                </div>
+                <div class="card-body">
+                    {% for discussion in stats.recent_discussions %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <h6 class="text-primary">{{ discussion.topic }}</h6>
+                        <small class="text-muted">
+                            <i class="fas fa-user"></i> {{ discussion.author }}<br>
+                            <i class="fas fa-tag"></i> {{ discussion.category }}
+                        </small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-briefcase"></i> Recent Jobs</h5>
+                </div>
+                <div class="card-body">
+                    {% for job in stats.recent_jobs %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <h6 class="text-primary">{{ job.title }}</h6>
+                        <small class="text-muted">
+                            <i class="fas fa-building"></i> {{ job.company }}<br>
+                            <i class="fas fa-map-marker-alt"></i> {{ job.location }}
+                        </small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Options -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-download"></i> Data Export</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2 mb-2">
+                            <a href="{{ url_for('export_data', data_type='users') }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-users"></i> Export Users
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <a href="{{ url_for('export_data', data_type='events') }}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-calendar"></i> Export Events
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <a href="{{ url_for('export_data', data_type='discussions') }}" class="btn btn-outline-info w-100">
+                                <i class="fas fa-comments"></i> Export Discussions
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <a href="{{ url_for('export_data', data_type='jobs') }}" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-briefcase"></i> Export Jobs
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <a href="{{ url_for('export_data', data_type='mentorships') }}" class="btn btn-outline-danger w-100">
+                                <i class="fas fa-user-graduate"></i> Export Mentorships
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <a href="{{ url_for('send_newsletter') }}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-envelope"></i> Send Newsletter
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin_create_event') }}" class="btn btn-primary w-100">
+                                <i class="fas fa-plus"></i> Create Event
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin_create_discussion') }}" class="btn btn-info w-100">
+                                <i class="fas fa-plus"></i> Create Discussion
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin_create_job') }}" class="btn btn-warning w-100">
+                                <i class="fas fa-plus"></i> Post Job
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin_create_mentorship') }}" class="btn btn-danger w-100">
+                                <i class="fas fa-plus"></i> Create Mentorship
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

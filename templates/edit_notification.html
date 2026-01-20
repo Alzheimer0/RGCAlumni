@@ -1,0 +1,30 @@
+<!-- ./templates/edit_notification.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Edit Notification</h2>
+    <form method="post">
+        <!-- <div class="mb-3">
+            <label for="user_id" class="form-label">User Name</label>
+            <input tabindex="0" type="text" class="form-control" id="user_id" name="user_id" placeholder="{{ notification.user }}" required>
+        </div> -->
+        <div class="mb-3">
+            <label for="recipients" class="form-label">Recipients</label>
+            <select id="recipients" name="recipients" class="form-control" multiple required>
+                <option value="all">All User</option>
+                {% for user in users %}
+                    {% if user.username != current_user.username %}
+                    <option value="{{ user.username }}">{{ user.username }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="message" class="form-label">Message</label>
+            <textarea tabindex="0" class="form-control" id="message" name="message" rows="3" placeholder="{{ notification.message }}" required></textarea>
+        </div>
+        <button class="btn btn-primary" tabindex="0" type="submit">Update Notification</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+<!-- ./templates/upload.html -->
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h3 class="mb-0 text-center"><i class="fas fa-camera text-primary"></i> Upload Profile Picture</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('edit_profile', alumni_id=alumni._id) }}" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="photo" class="form-label">Choose Profile Picture</label>
+                            <input type="file" class="form-control" id="photo" name="photo" accept="image/*" required>
+                            <div class="form-text">Supported formats: PNG, JPG, JPEG, GIF. Max size: 5MB</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div id="image-preview" class="d-none text-center">
+                                <img id="preview-img" src="#" alt="Image Preview" class="img-thumbnail rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('view_profile') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Profile
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Upload Picture
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('photo').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.classList.remove('d-none');
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.classList.add('d-none');
+    }
+});
+</script>
+{% endblock %}

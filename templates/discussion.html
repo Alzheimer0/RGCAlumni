@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Discussion Topic -->
+    <h2 class="mb-4 text-primary">{{ discussion.topic }}</h2>
+
+    <!-- Discussion Content -->
+    <div class="card mb-4 shadow-sm p-4">
+        <p>{{ discussion.content }}</p>
+        <p><strong>Category:</strong> {{ discussion.category }}</p>
+        <p><strong>Author:</strong> {{ discussion.author }}</p>
+    </div>
+
+    <!-- Replies Section -->
+    <h3 class="text-info">Replies</h3>
+    <ul class="list-group mb-4 shadow-sm">
+        {% for reply in replies %}
+        <li class="list-group-item">
+            <p>{{ reply.content }}</p>
+            <p><strong>Author:</strong> {{ reply.author }}</p>
+        </li>
+        {% else %}
+        <li class="list-group-item text-muted">No replies yet. Be the first to reply!</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Post a Reply Section -->
+    <h3 class="text-success mb-3">Post a Reply</h3>
+    <form method="post" class="shadow-sm p-4 rounded bg-light">
+        <div class="mb-3">
+            <label class="form-label" for="content">Reply:</label>
+            <textarea class="form-control" tabindex="0" id="content" name="content" placeholder="Enter your reply here..." rows="4" required></textarea>
+        </div>
+        <button class="btn btn-success" tabindex="0" type="submit">Post Reply</button>
+    </form>
+</div>
+{% endblock %}

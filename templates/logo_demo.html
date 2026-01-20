@@ -1,0 +1,384 @@
+<!-- ./templates/logo_demo.html -->
+{% extends "layout.html" %}
+
+{% block title %}Logo System Demo - RGCACS Alumni{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-lg">
+                <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h1 class="text-white mb-0">
+                        <i class="fas fa-image"></i> 
+                        Complete Logo System Demo
+                    </h1>
+                    <p class="text-white-50 mb-0">Showcasing all logo features and functionality</p>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- Official Logo Announcement -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="alert alert-success border-success" style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-left: 5px solid #28a745;">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-certificate fa-2x text-success me-3"></i>
+                                    <div>
+                                        <h5 class="alert-heading mb-1 text-success">
+                                            <i class="fas fa-star"></i> Official RGCACS Logo Now Active!
+                                        </h5>
+                                        <p class="mb-0">The system is now using the official Rajiv Gandhi College of Arts, Commerce & Science logo with the motto "Trust Transforms Life". This is the authentic college branding that represents our institution's values and mission. Toggle to see the alumni-specific logo.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logo Switching Demo -->
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <h3><i class="fas fa-exchange-alt text-primary"></i> Interactive Logo Switching</h3>
+                            <p class="text-muted">Click the switch button to toggle between college and alumni logos. The system saves your preference automatically.</p>
+                            
+                            <div class="text-center p-4 border rounded bg-light">
+                                <div class="navbar-brand-container mb-3" style="justify-content: center;">
+                                    <div class="navbar-brand" style="background: rgba(52, 58, 64, 0.9);">
+                                        <div class="logo-wrapper">
+                                            <img id="demo-primary-logo" 
+                                                 src="{{ url_for('static', filename='image/RGC.jpeg') }}" 
+                                                 alt="Official RGCACS Logo" 
+                                                 class="logo-image primary-logo">
+                                            <img id="demo-secondary-logo" 
+                                                 src="{{ url_for('static', filename='image/alumni.jpeg') }}" 
+                                                 alt="Alumni Logo" 
+                                                 class="logo-image secondary-logo d-none">
+                                        </div>
+                                        <div class="logo-text">
+                                            <span class="college-name-short">RGCACS</span>
+                                            <span class="alumni-text">Alumni Portal</span>
+                                        </div>
+                                    </div>
+                                    <button class="logo-switch-btn" onclick="demoToggleLogo()" type="button">
+                                        <i class="fas fa-exchange-alt"></i>
+                                    </button>
+                                </div>
+                                <p class="mb-0 text-muted">Current preference is saved automatically</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logo Features Grid -->
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <h3><i class="fas fa-star text-warning"></i> Logo System Features</h3>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-mobile-alt fa-3x text-success mb-3"></i>
+                                    <h5>Responsive Design</h5>
+                                    <p class="text-muted">Logos adapt perfectly to all screen sizes and devices</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-universal-access fa-3x text-info mb-3"></i>
+                                    <h5>Accessibility Ready</h5>
+                                    <p class="text-muted">Full keyboard navigation and screen reader support</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+                                    <h5>Analytics Tracking</h5>
+                                    <p class="text-muted">Comprehensive analytics for logo usage and preferences</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-palette fa-3x text-danger mb-3"></i>
+                                    <h5>Custom Branding</h5>
+                                    <p class="text-muted">Support for multiple logo variants and themes</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-bolt fa-3x text-warning mb-3"></i>
+                                    <h5>Fast Loading</h5>
+                                    <p class="text-muted">Optimized images with progressive loading and caching</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
+                                    <h5>Error Handling</h5>
+                                    <p class="text-muted">Graceful fallbacks and error recovery mechanisms</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logo Variants Preview -->
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <h3><i class="fas fa-images text-secondary"></i> Available Logo Variants</h3>
+                            <p class="text-muted">Preview of all available logo options in the system</p>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h6 class="mb-0">Official College Logo (JPEG)</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <img src="{{ url_for('static', filename='image/RGC.jpeg') }}" 
+                                         alt="Official RGCACS Logo" 
+                                         class="img-fluid" 
+                                         style="max-height: 120px;">
+                                    <p class="mt-2 text-muted small">Official college branding logo</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0">Alumni Logo (JPEG)</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <img src="{{ url_for('static', filename='image/alumni.jpeg') }}" 
+                                         alt="Alumni Logo" 
+                                         class="img-fluid rounded" 
+                                         style="max-height: 120px;">
+                                    <p class="mt-2 text-muted small">Alumni-specific branding</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6 class="mb-0">Alumni Logo (JPEG)</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <img src="{{ url_for('static', filename='image/alumni.jpeg') }}" 
+                                         alt="Alumni Logo" 
+                                         class="img-fluid rounded" 
+                                         style="max-height: 120px;">
+                                    <p class="mt-2 text-muted small">Alumni-specific branding</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Technical Specifications -->
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <h3><i class="fas fa-cogs text-dark"></i> Technical Specifications</h3>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Supported Formats</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <li><i class="fab fa-html5 text-danger"></i> SVG (Recommended)</li>
+                                        <li><i class="fas fa-image text-primary"></i> PNG (Transparent backgrounds)</li>
+                                        <li><i class="fas fa-image text-success"></i> JPEG/JPG (High compression)</li>
+                                        <li><i class="fas fa-film text-warning"></i> GIF (Animated support)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Size Requirements</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-desktop text-primary"></i> Primary: 200x200px minimum</li>
+                                        <li><i class="fas fa-tablet-alt text-success"></i> Secondary: 150x150px minimum</li>
+                                        <li><i class="fas fa-bookmark text-warning"></i> Favicon: 32x32px or 16x16px</li>
+                                        <li><i class="fas fa-file-archive text-danger"></i> Max file size: 5MB</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- API Demonstration -->
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <h3><i class="fas fa-code text-info"></i> Developer API</h3>
+                            <p class="text-muted">JavaScript API functions available for logo management</p>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6>Available Functions:</h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <button class="btn btn-outline-primary btn-sm mb-2 w-100" onclick="toggleLogo()">
+                                                <i class="fas fa-exchange-alt"></i> toggleLogo()
+                                            </button>
+                                            <button class="btn btn-outline-success btn-sm mb-2 w-100" onclick="checkLogoSystemHealth()">
+                                                <i class="fas fa-heartbeat"></i> checkLogoSystemHealth()
+                                            </button>
+                                            <button class="btn btn-outline-warning btn-sm mb-2 w-100" onclick="preloadLogos()">
+                                                <i class="fas fa-download"></i> preloadLogos()
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button class="btn btn-outline-info btn-sm mb-2 w-100" onclick="announceLogoChange('demo')">
+                                                <i class="fas fa-bullhorn"></i> announceLogoChange()
+                                            </button>
+                                            <button class="btn btn-outline-secondary btn-sm mb-2 w-100" onclick="initializeLogoSystem()">
+                                                <i class="fas fa-play"></i> initializeLogoSystem()
+                                            </button>
+                                            <button class="btn btn-outline-dark btn-sm mb-2 w-100" onclick="resetLogoPreference()">
+                                                <i class="fas fa-undo"></i> resetLogoPreference()
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Controls -->
+                    {% if current_user.is_authenticated and current_user.is_admin() %}
+                    <div class="row">
+                        <div class="col-12">
+                            <h3><i class="fas fa-user-shield text-danger"></i> Admin Controls</h3>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> 
+                                You have admin privileges. Access additional logo management features.
+                            </div>
+                            
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('admin_logo_upload') }}" class="btn btn-primary">
+                                    <i class="fas fa-upload"></i> Manage Logos
+                                </a>
+                                <a href="{{ url_for('admin_logo_analytics') }}" class="btn btn-success">
+                                    <i class="fas fa-chart-bar"></i> View Analytics
+                                </a>
+                                <button class="btn btn-warning" onclick="generateLogoReport()">
+                                    <i class="fas fa-file-download"></i> Generate Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Demo-specific logo toggle function
+function demoToggleLogo() {
+    const primaryLogo = document.getElementById('demo-primary-logo');
+    const secondaryLogo = document.getElementById('demo-secondary-logo');
+    
+    if (primaryLogo.classList.contains('d-none')) {
+        primaryLogo.classList.remove('d-none');
+        secondaryLogo.classList.add('d-none');
+    } else {
+        primaryLogo.classList.add('d-none');
+        secondaryLogo.classList.remove('d-none');
+    }
+    
+    // Show notification
+    const notification = document.getElementById('logo-switch-notification');
+    if (notification) {
+        notification.classList.add('show');
+        setTimeout(() => notification.classList.remove('show'), 2000);
+    }
+}
+
+// Reset logo preference
+function resetLogoPreference() {
+    localStorage.removeItem('logoPreference');
+    alert('Logo preference has been reset!');
+    location.reload();
+}
+
+// Generate logo report (admin only)
+function generateLogoReport() {
+    fetch('/api/logo/report', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'logo-system-report.pdf';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    })
+    .catch(error => {
+        console.error('Failed to generate report:', error);
+        alert('Failed to generate report. Please try again.');
+    });
+}
+
+// Demo page initialization
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Logo Demo Page Initialized');
+    
+    // Add demo-specific enhancements
+    const demoCards = document.querySelectorAll('.card');
+    demoCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('animate-fadeInUp');
+    });
+});
+</script>
+
+<style>
+@keyframes animate-fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeInUp {
+    animation: animate-fadeInUp 0.6s ease-out forwards;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+</style>
+{% endblock %}

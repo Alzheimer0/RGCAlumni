@@ -1,0 +1,218 @@
+{% extends "layout.html" %}
+
+{% block title %}Search Results - Rajiv Gandhi Alumini Network{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">
+                        <i class="fas fa-search"></i> Search Results
+                        {% if query %}
+                            for "{{ query }}"
+                        {% endif %}
+                    </h2>
+                    
+                    <!-- Search Form -->
+                    <form method="GET" action="{{ url_for('global_search') }}" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="text" name="q" class="form-control" placeholder="Search across all content..." value="{{ query }}">
+                            </div>
+                            <div class="col-md-3">
+                                <select name="type" class="form-select">
+                                    <option value="all" {% if search_type == 'all' %}selected{% endif %}>All Content</option>
+                                    <option value="events" {% if search_type == 'events' %}selected{% endif %}>Events</option>
+                                    <option value="discussions" {% if search_type == 'discussions' %}selected{% endif %}>Discussions</option>
+                                    <option value="jobs" {% if search_type == 'jobs' %}selected{% endif %}>Jobs</option>
+                                    <option value="mentorships" {% if search_type == 'mentorships' %}selected{% endif %}>Mentorships</option>
+                                    {% if current_user.is_admin() %}
+                                    <option value="users" {% if search_type == 'users' %}selected{% endif %}>Users</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if query %}
+    <div class="row">
+        <!-- Events Results -->
+        {% if results.events %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-alt"></i> Events ({{ results.events|length }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for event in results.events %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <h6 class="text-primary">{{ event.title }}</h6>
+                        <p class="text-muted small">{{ event.description[:100] }}...</p>
+                        <small class="text-muted">
+                            <i class="fas fa-map-marker-alt"></i> {{ event.location }} | 
+                            <i class="fas fa-calendar"></i> {{ event.date.strftime('%Y-%m-%d') }}
+                        </small>
+                        <div class="mt-2">
+                            <a href="{{ url_for('view_event', event_id=event._id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Discussions Results -->
+        {% if results.discussions %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments"></i> Discussions ({{ results.discussions|length }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for discussion in results.discussions %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <h6 class="text-primary">{{ discussion.topic }}</h6>
+                        <p class="text-muted small">{{ discussion.content[:100] }}...</p>
+                        <small class="text-muted">
+                            <i class="fas fa-user"></i> {{ discussion.author }} | 
+                            <i class="fas fa-tag"></i> {{ discussion.category }}
+                        </small>
+                        <div class="mt-2">
+                            <a href="{{ url_for('view_discussion', discussion_id=discussion._id) }}" class="btn btn-sm btn-outline-primary">View Discussion</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Jobs Results -->
+        {% if results.jobs %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-briefcase"></i> Jobs ({{ results.jobs|length }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for job in results.jobs %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <h6 class="text-primary">{{ job.title }}</h6>
+                        <p class="text-muted small">{{ job.description[:100] }}...</p>
+                        <small class="text-muted">
+                            <i class="fas fa-building"></i> {{ job.company }} | 
+                            <i class="fas fa-map-marker-alt"></i> {{ job.location }}
+                        </small>
+                        <div class="mt-2">
+                            <a href="{{ url_for('view_job', job_id=job._id) }}" class="btn btn-sm btn-outline-primary">View Job</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Mentorships Results -->
+        {% if results.mentorships %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-graduate"></i> Mentorships ({{ results.mentorships|length }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for mentorship in results.mentorships %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <h6 class="text-primary">{{ mentorship.mentor_name }} - {{ mentorship.mentee_name }}</h6>
+                        <p class="text-muted small">{{ mentorship.details[:100] }}...</p>
+                        <small class="text-muted">
+                            <i class="fas fa-envelope"></i> {{ mentorship.contact_info }}
+                        </small>
+                        <div class="mt-2">
+                            <a href="{{ url_for('view_mentorship', mentorship_id=mentorship._id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Users Results (Admin Only) -->
+        {% if current_user.is_admin() and results.users %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users"></i> Users ({{ results.users|length }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for user in results.users %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <h6 class="text-primary">{{ user.username }}</h6>
+                        <small class="text-muted">
+                            <i class="fas fa-user-tag"></i> {{ user.role }}
+                        </small>
+                        <div class="mt-2">
+                            <a href="{{ url_for('admin_edit_user', user_id=user._id) }}" class="btn btn-sm btn-outline-primary">Edit User</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- No Results Message -->
+    {% if not results.events and not results.discussions and not results.jobs and not results.mentorships and not results.users %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4>No results found</h4>
+                    <p class="text-muted">Try adjusting your search terms or search in different categories.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Initial Search Page -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-search fa-4x text-primary mb-4"></i>
+                    <h3>Search Across All Content</h3>
+                    <p class="text-muted">Find events, discussions, jobs, mentorships, and more.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

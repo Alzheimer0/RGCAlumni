@@ -1,0 +1,31 @@
+<!-- ./templates/edit_user.html -->
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Edit User</h2>
+    <form method="post">
+        <div>
+            <label for="username">Username</label>
+            <input tabindex="0" type="text" id="username" name="username" value="{{ user.username }}" required>
+        </div>
+        <div>
+            <label for="email">Email</label>
+            <input tabindex="0" type="email" id="email" name="email" value="{{ user.email if user.email else '' }}" required>
+        </div>
+        <div>
+            <label for="username">Password</label>
+            <input tabindex="0" type="text" id="password" name="password" pattern=".{6,}" title="Password should at least be of 6 characters " placeholder="Enter New Password" required>
+        </div>
+        <div>
+            <label for="role">Role</label>
+            <select id="role" name="role" required>
+                <option tabindex="0" value="User" {% if user.role == 'User' %}selected{% endif %}>User</option>
+                <option tabindex="0" value="Admin" {% if user.role == 'Admin' %}selected{% endif %}>Admin</option>
+            </select>
+        </div>
+        <button tabindex="0" class="btn btn-primary" type="submit">Update</button>
+    </form>
+</div>
+{% endblock %}

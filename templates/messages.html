@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+
+{% block title %}Messages - Rajiv Gandhi Alumini Network{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-envelope"></i> Messages</h2>
+            <p class="text-muted">Connect with other alumni through direct messages</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-inbox"></i> Conversations</h5>
+                    <button class="btn btn-sm btn-light" id="refresh-conversations">
+                        <i class="fas fa-sync"></i>
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    {% if conversations %}
+                        <div class="list-group list-group-flush">
+                            {% for conv in conversations %}
+                            <a href="{{ url_for('conversation', username=conv._id) }}" 
+                               class="list-group-item list-group-item-action {% if conv._id == recipient %}active{% endif %}">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ conv._id }}</h6>
+                                    <small>{{ conv.last_message.timestamp.strftime('%H:%M') if conv.last_message.timestamp else '' }}</small>
+                                </div>
+                                <p class="mb-1 text-truncate">{{ conv.last_message.message if conv.last_message.message else 'No messages yet' }}</p>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="p-3 text-center text-muted">
+                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                            <p>No conversations yet</p>
+                            <a href="{{ url_for('global_search') }}" class="btn btn-outline-primary btn-sm">
+                                Find alumni to message
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Select a Conversation</h5>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                    <h5>Select a conversation from the list</h5>
+                    <p class="text-muted">
+                        Choose a conversation from the left panel to view messages or start a new conversation.
+                    </p>
+                    <a href="{{ url_for('global_search') }}" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Find Alumni
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize SocketIO
+        const socket = io();
+        
+        // Refresh conversations button
+        document.getElementById('refresh-conversations').addEventListener('click', function() {
+            location.reload();
+        });
+        
+        // Join messaging room
+        socket.emit('join_messaging', {
+            username: "{{ current_user.username }}"
+        });
+    });
+</script>
+{% endblock %}

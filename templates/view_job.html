@@ -1,0 +1,37 @@
+<!-- ./templates/view_job.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-primary text-center">Job Details</h2>
+    <div class="card shadow-lg p-4">
+        <h2 class="mb-4 text-primary">{{ job.title }}</h2>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>Company:</strong> {{ job.company }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Location:</strong> {{ job.location }}</p>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <p><strong>Description:</strong></p>
+            <p class="text-muted">{{ job.description }}</p>
+        </div>
+
+        <div class="mb-3">
+            <p><strong>Posted by:</strong> {{ job.posted_by }}</p>
+        </div>
+
+        <!-- Edit Button (Visible only if the user posted the job) -->
+        {% if job.posted_by == current_user.username %}
+        <div class="card-footer d-flex justify-content-end">
+            <a tabindex="0" href="{{ url_for('edit_job', job_id=job._id) }}" class="btn btn-warning mb-2">Edit Job</a>
+            <a tabindex="0" href="{{ url_for('delete_job', job_id=job._id) }}" class="btn btn-danger mb-2" onclick="return confirmDelete()">Delete Job</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="240" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Shield - Yellow/Gold -->
+  <path d="M100 10 L170 40 L170 140 Q170 180 100 220 Q30 180 30 140 L30 40 Z" 
+        fill="#FFD700" stroke="#2B4C3A" stroke-width="3"/>
+  
+  <!-- Inner Shield Border - Green -->
+  <path d="M100 25 L155 45 L155 125 Q155 155 100 185 Q45 155 45 125 L45 45 Z" 
+        fill="#FFEB3B" stroke="#1B5E20" stroke-width="2"/>
+  
+  <!-- Educational Torch/Flame Symbol (Simplified) -->
+  <g transform="translate(100,70)">
+    <!-- Torch Base -->
+    <rect x="-8" y="35" width="16" height="25" fill="#388E3C" rx="2"/>
+    <rect x="-12" y="55" width="24" height="8" fill="#2E7D32" rx="4"/>
+    
+    <!-- Large Flame/Knowledge Symbol -->
+    <path d="M0 35 Q-15 20 -10 5 Q-5 -5 0 0 Q5 -5 10 5 Q15 20 0 35" 
+          fill="#2E7D32"/>
+    <path d="M0 30 Q-10 18 -7 8 Q-3 2 0 5 Q3 2 7 8 Q10 18 0 30" 
+          fill="#4CAF50"/>
+    <path d="M0 25 Q-6 15 -4 10 Q-2 6 0 8 Q2 6 4 10 Q6 15 0 25" 
+          fill="#66BB6A"/>
+    
+    <!-- Inner flame detail -->
+    <path d="M0 20 Q-3 12 -2 8 Q-1 6 0 7 Q1 6 2 8 Q3 12 0 20" 
+          fill="#81C784"/>
+  </g>
+  
+  <!-- Motto Banner - Green -->
+  <rect x="15" y="130" width="170" height="30" fill="#2E7D32" rx="15"/>
+  <text x="100" y="148" font-family="Arial, sans-serif" font-size="12" font-weight="bold" 
+        text-anchor="middle" fill="white">● TRUST TRANSFORMS LIFE! ●</text>
+  
+  <!-- College Name - Maroon/Dark Red -->
+  <text x="100" y="175" font-family="Georgia, serif" font-size="15" font-weight="bold" 
+        text-anchor="middle" fill="#8B0000">RAJIV GANDHI COLLEGE</text>
+  <text x="100" y="195" font-family="Georgia, serif" font-size="11" 
+        text-anchor="middle" fill="#8B0000">OF ARTS, COMMERCE &amp; SCIENCE</text>
+  
+  <!-- Decorative Corner Elements -->
+  <circle cx="50" cy="60" r="3" fill="#2E7D32"/>
+  <circle cx="150" cy="60" r="3" fill="#2E7D32"/>
+  <circle cx="70" cy="100" r="2" fill="#4CAF50"/>
+  <circle cx="130" cy="100" r="2" fill="#4CAF50"/>
+  
+  <!-- Additional decorative elements -->
+  <path d="M45 80 Q50 75 55 80" stroke="#4CAF50" stroke-width="2" fill="none"/>
+  <path d="M145 80 Q150 75 155 80" stroke="#4CAF50" stroke-width="2" fill="none"/>
+  
+  <!-- Bottom decorative flourish -->
+  <path d="M80 210 Q100 205 120 210" stroke="#2E7D32" stroke-width="2" fill="none"/>
+</svg>

@@ -1,0 +1,55 @@
+<!-- ./templates/jobs.html -->
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold"><i class="fas fa-briefcase icon"></i> JOB BOARD</h1>
+        <a tabindex="0" href="{{ url_for('admin_create_job') }}" class="btn btn-primary mb-3">Post a New Job</a>
+    </div>
+
+    {% if user_jobs %}
+    <section class="mb-5">
+        <h2 class="text-primary">Your Job Posts</h2>
+        <ul class="list-group">
+            {% for job in user_jobs %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4><a tabindex="0" href="{{ url_for('view_job', job_id=job._id) }}" class="text-decoration-none text-primary ">{{ job.title }}</a> at {{ job.company }}</h4>
+                        <div class="text-muted">
+                            <p><strong>Location: </strong> {{ job.location }}</p>
+                            <p><strong>Posted by: </strong> {{ job.posted_by }}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <a tabindex="0" href="{{ url_for('view_job', job_id=job._id) }}" class="btn btn-primary btn-sm me-2">View</a>
+                        <a tabindex="0" href="{{ url_for('admin_edit_job', job_id=job._id) }}" class="btn btn-warning btn-sm me-2">Edit</a>
+                        <a tabindex="0" href="{{ url_for('admin_delete_job', job_id=job._id) }}" class="btn btn-danger btn-sm me-2" onclick="return confirmDelete()">Delete</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+    <section>
+        <h2 class="text-primary">All Job Posts</h2>
+        <ul class="list-group">
+            {% for job in jobs %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <h4><a tabindex="0" href="{{ url_for('view_job', job_id=job._id) }}" class="text-decoration-none text-primary ">{{ job.title }}</a> at {{ job.company }}</h4>
+                    <div class="text-muted">
+                        <p><strong>Location: </strong> {{ job.location }}</p>
+                        <p><strong>Posted by: </strong> {{ job.posted_by }}</p>
+                    </div>
+                </div>
+                <div>
+                    <a tabindex="0" href="{{ url_for('view_job', job_id=job._id) }}" class="btn btn-primary btn-sm me-2">View</a>
+                    
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+</div>
+{% endblock %}

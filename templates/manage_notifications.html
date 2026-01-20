@@ -1,0 +1,43 @@
+<!-- ./templates/mange_jobs.html -->
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Manage Notifications</h2>
+    <form id="deleteUsersForm" method="POST" action="{{ url_for('admin_delete_notifications') }}">
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col"><input type="checkbox" id="selectAll"></th>
+                <th>Username</th>
+                <th>Message</th>
+                <th>Created By</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for notification in notifications %}
+            <tr>
+                <td><input type="checkbox" name="notification_ids" value="{{ notification._id }}"></td>
+                <td>{{ notification.recipients | join(', ')}}</td>
+                <td>{{ notification.message }}</td>
+                <td>{{ notification.created_by }}</td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="{{ url_for('admin_edit_notification', notification_id=notification._id) }}">Edit</a>
+                    <a class="btn btn-danger btn-sm" href="{{ url_for('admin_delete_notification', notification_id=notification._id) }}" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-danger">Delete Selected</button>
+    </form>
+</div>
+<script>
+    document.getElementById('selectAll').addEventListener('click', function(event) {
+        const checkboxes = document.querySelectorAll('input[name="notification_ids"]');
+        checkboxes.forEach(checkbox => checkbox.checked = event.target.checked);
+    });
+</script>
+{% endblock %}

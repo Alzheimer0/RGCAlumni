@@ -1,0 +1,27 @@
+<!-- ./templates/create_discussion.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center text-primary">Create New Discussion</h2>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <form method="post">
+                <div class="mb-3">
+                    <label for="topic" class="form-label">Topic:</label>
+                    <input class="form-control" tabindex="0" type="text" id="topic" name="topic" placeholder="Enter Topic" required>
+                </div>
+                <div class="mb-3">
+                    <label for="category" class="form-label">Category:</label>
+                    <input class="form-control" tabindex="0" type="text" id="category" name="category" placeholder="Enter Category" required>
+                </div>
+                <div class="mb-3">
+                    <label for="content" class="form-label">Content:</label>
+                    <textarea class="form-control" tabindex="0" id="content" name="content" placeholder="Enter Content" rows="5" required></textarea>
+                </div>
+                <button class="btn btn-primary" tabindex="0" type="submit">Create Discussion</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

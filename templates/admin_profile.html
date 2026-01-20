@@ -1,0 +1,191 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin Profile - RGCACS Alumni{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <h2>
+                        <i class="fas fa-user-shield"></i> Admin Profile Settings
+                    </h2>
+                    <p class="text-muted">Manage your admin account information</p>
+                </div>
+
+                <div class="profile-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" class="admin-profile-form">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="username">
+                                    <i class="fas fa-user"></i> Username
+                                </label>
+                                <input class="form-control" 
+                                       type="text" 
+                                       id="username" 
+                                       name="username" 
+                                       value="{{ user.username }}" 
+                                       readonly
+                                       title="Username cannot be changed">
+                                <small class="text-muted">Username cannot be modified</small>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="role">
+                                    <i class="fas fa-shield-alt"></i> Role
+                                </label>
+                                <input class="form-control" 
+                                       type="text" 
+                                       id="role" 
+                                       name="role" 
+                                       value="{{ user.role }}" 
+                                       readonly
+                                       title="Role cannot be changed">
+                                <small class="text-muted">Role cannot be modified</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label" for="email">
+                                <i class="fas fa-envelope"></i> Admin Email Address
+                            </label>
+                            <input class="form-control form-control-lg" 
+                                   type="email" 
+                                   id="email" 
+                                   name="email" 
+                                   value="{{ user.email if user.email else '' }}" 
+                                   placeholder="Enter admin email address"
+                                   required>
+                            <small class="text-muted">This email will be used for admin communications and notifications</small>
+                        </div>
+
+                        <div class="profile-actions">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Update Email
+                            </button>
+                            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <!-- Account Information -->
+                    <div class="account-info">
+                        <h5><i class="fas fa-info-circle"></i> Account Information</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Account Created:</strong> 
+                                    {{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'Unknown' }}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>User ID:</strong> {{ user._id }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.profile-header h2 {
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.profile-body {
+    padding: 2rem;
+}
+
+.admin-profile-form .form-control {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.admin-profile-form .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.admin-profile-form .form-control[readonly] {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.profile-actions .btn {
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+}
+
+.profile-actions .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.profile-actions .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.account-info {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.account-info h5 {
+    color: #495057;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .profile-actions {
+        flex-direction: column;
+    }
+    
+    .profile-actions .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

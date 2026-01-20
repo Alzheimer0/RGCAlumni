@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block title %}Send Newsletter - Rajiv Gandhi Alumini Network{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-envelope"></i> Send Newsletter</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subject" name="subject" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Content</label>
+                            <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Recipients</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="all_users" name="recipients" value="all" checked>
+                                <label class="form-check-label" for="all_users">
+                                    All Users
+                                </label>
+                            </div>
+                            <div class="mt-2">
+                                <label class="form-label">Or select specific users:</label>
+                                <select class="form-select" name="recipients" multiple>
+                                    {% for user in users %}
+                                    <option value="{{ user.username }}">{{ user.username }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('analytics_dashboard') }}" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Send Newsletter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('all_users').addEventListener('change', function() {
+    const selectElement = document.querySelector('select[name="recipients"]');
+    if (this.checked) {
+        selectElement.disabled = true;
+    } else {
+        selectElement.disabled = false;
+    }
+});
+</script>
+{% endblock %}
