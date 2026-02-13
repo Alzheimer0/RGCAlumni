@@ -12,21 +12,14 @@
                     <p class="login-subtitle">Rajiv Gandhi College of Arts, Commerce & Science</p>
                 </div>
                 
-                <!-- Admin Login Instructions -->
+                <!-- Admin Login Information -->
                 <div class="admin-login-info">
                     <div class="alert alert-info">
                         <h6><i class="fas fa-user-shield"></i> Admin Login Information</h6>
                         <div class="row">
-                            <div class="col-md-6">
-                                <strong>Username:</strong> admin<br>
-                                <strong>Email:</strong> alzheimer085@gmail.com<br>
-                                <strong>Password:</strong> admin123
-                            </div>
-                            <div class="col-md-6">
-                                <small>If admin account doesn't exist:</small><br>
-                                <a href="{{ url_for('create_admin_now') }}" class="btn btn-sm btn-outline-primary" target="_blank">
-                                    <i class="fas fa-plus"></i> Create Admin Account
-                                </a>
+                            <div class="col-md-12">
+                                <p>The first user to register will automatically become an admin.</p>
+                                <p>If you're the first user, register with your desired credentials and you'll have admin access.</p>
                             </div>
                         </div>
                     </div>
@@ -95,18 +88,8 @@ function togglePassword() {
     }
 }
 
-// Auto-fill admin credentials when clicking the admin info
-document.addEventListener('DOMContentLoaded', function() {
-    const adminInfo = document.querySelector('.admin-login-info');
-    if (adminInfo) {
-        adminInfo.addEventListener('click', function() {
-            if (confirm('Auto-fill admin credentials?')) {
-                document.getElementById('username').value = 'admin';
-                document.getElementById('password').value = 'admin123';
-            }
-        });
-    }
-});
+// Removed auto-fill admin credentials functionality
+// As we no longer have hardcoded admin credentials
 </script>
 
 <style>

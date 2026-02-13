@@ -1,8 +1,10 @@
 # ./app.py
 
-from flask import Flask, render_template, redirect, url_for, request, flash, jsonify, send_file
+from flask import Flask, render_template, redirect, url_for, request, flash, jsonify, send_file, Response
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_mail import Mail, Message
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from werkzeug.security import generate_password_hash, check_password_hash
 import bcrypt
 from flask_pymongo import PyMongo
@@ -23,11 +25,34 @@ load_dotenv()
 
 app = Flask(__name__)
 
+# Security Headers
+from flask import request, g
+from datetime import datetime
+
+@app.after_request
+def after_request(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    return response
+
 # Initialize SocketIO
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+# Initialize rate limiter
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"]
+)
+limiter.init_app(app)
+
 # Secret key for session management
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'fallback-secret-key-for-development')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+if not app.config['SECRET_KEY']:
+    print("⚠️  SECRET_KEY not set in environment variables")
+    print("📝 Please set SECRET_KEY in your .env file with a strong random value")
+    exit(1)
 
 # Database configuration
 mongo_uri = os.getenv('MONGO_URI')
@@ -54,7 +79,7 @@ else:
     mongo = None
 
 # Upload configuration
-app.config['UPLOADED_PHOTOS_DEST'] = 'static/uploads'
+app.config['UPLOADED_PHOTOS_DEST'] = os.getenv('UPLOAD_PATH', 'static/uploads')
 # Create upload directory if it doesn't exist
 import os
 if not os.path.exists(app.config['UPLOADED_PHOTOS_DEST']):
@@ -88,63 +113,15 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 def create_admin_user():
-    # Create primary admin user
-    admin_username = 'admin'
-    admin_password = 'admin'
-    admin_role = 'Admin'
+    # Admin user creation is now disabled to prevent hardcoded credentials
+    # Admin users should be created through a secure setup process or registration
+    print("Admin user creation through code is disabled for security reasons.")
+    print("Admin users should be created via registration or secure setup process.")
     
-    if mongo is None:
-        print("⚠️  Skipping admin user creation - MongoDB not connected")
-        return
-
-    # Check if primary admin user already exists
-    existing_admin = mongo.db.users.find_one({"username": admin_username, "role": admin_role})
-    
-    if existing_admin:
-        # Update existing admin with new email if it doesn't have one or has old email
-        if not existing_admin.get('email') or existing_admin.get('email') == 'admin@rgcacs.edu':
-            mongo.db.users.update_one(
-                {"username": admin_username, "role": admin_role},
-                {"$set": {"email": "alzheimer085@gmail.com"}}
-            )
-            print("Admin user email updated to alzheimer085@gmail.com.")
-        else:
-            print("Admin user already exists. Skipping creation.")
-    else:
-        # Hash the password before storing it
-        hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt())
-        admin_user = {
-            "username": admin_username,
-            "email": "alzheimer085@gmail.com",
-            "password": hashed_password,
-            "role": admin_role,
-            "created_at": datetime.now()
-        }
-        mongo.db.users.insert_one(admin_user)
-        print("Admin user created successfully with email alzheimer085@gmail.com.")
-    
-    # Create secondary admin user
-    admin2_username = 'admin2nd'
-    admin2_password = 'Admin2nd'
-    admin2_role = 'Admin'
-    
-    # Check if secondary admin user already exists
-    existing_admin2 = mongo.db.users.find_one({"username": admin2_username, "role": admin2_role})
-    
-    if existing_admin2:
-        print("Second admin user already exists. Skipping creation.")
-    else:
-        # Hash the password before storing it
-        hashed_password2 = bcrypt.hashpw(admin2_password.encode('utf-8'), bcrypt.gensalt())
-        admin2_user = {
-            "username": admin2_username,
-            "email": "admin2@rgcacs.edu",
-            "password": hashed_password2,
-            "role": admin2_role,
-            "created_at": datetime.now()
-        }
-        mongo.db.users.insert_one(admin2_user)
-        print("Second admin user created successfully with username admin2nd.")
+    # Check if any admin user exists
+    existing_admin = mongo.db.users.find_one({"role": "Admin"})
+    if not existing_admin:
+        print("⚠️  No admin user found. First user to register will become admin if allowed by configuration.")
 
 # Define User model for authentication
 class User(UserMixin):
@@ -159,7 +136,27 @@ class User(UserMixin):
         self.created_at = user_dict.get('created_at')
 
     def is_admin(self):
-        return self.role == 'Admin' 
+        return self.role == 'Admin'
+
+# Function to upgrade first user to admin if no admin exists
+def upgrade_first_user_to_admin():
+    """Upgrade the first registered user to admin if no admin exists"""
+    if mongo is None:
+        return
+    
+    # Check if any admin exists
+    admin_exists = mongo.db.users.find_one({"role": "Admin"})
+    
+    if not admin_exists:
+        # Get the first user sorted by creation date
+        first_user = mongo.db.users.find_one({}, sort=[("created_at", 1)])
+        if first_user:
+            # Upgrade this user to admin
+            mongo.db.users.update_one(
+                {"_id": first_user['_id']},
+                {"$set": {"role": "Admin"}}
+            )
+            print(f"First user {first_user['username']} upgraded to Admin") 
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -167,11 +164,12 @@ def load_user(user_id):
         if mongo is None:
             return None
         user = mongo.db.users.find_one({"_id": ObjectId(user_id)})  # Convert to ObjectId
-        print(f"load_user: user_id={ObjectId(user_id)}, user={user}")  # Debugging statement
+        # Logging user load for debugging
+        app.logger.debug(f"Loading user with ID: {user_id}")
         if user:
             return User(user)
     except Exception as e:
-        print(f"Error loading user: {e}")  # Add error logging
+        app.logger.error(f"Error loading user {user_id}: {str(e)}")
     return None
 
 # Routes and view functions
@@ -243,7 +241,14 @@ def dashboard():
                              user_jobs=[], user_mentorships=[], user_events=[])
 
 @app.route('/register', methods=['GET', 'POST'])
+@limiter.limit("3 per minute")
 def register():
+    # Check rate limit
+    if request.endpoint == 'register' and request.method == 'POST':
+        if hasattr(request, 'is_rate_limited') and request.is_rate_limited:
+            app.logger.warning(f"Rate limit exceeded for IP: {get_remote_address()}")
+            flash('Too many registration attempts. Please try again later.', 'danger')
+            return render_template('register.html')
     if mongo is None:
         flash('Database connection error. Please try again later.', 'danger')
         return render_template('register.html')
@@ -255,6 +260,23 @@ def register():
             password = request.form.get('password')
             role = request.form.get('role', 'User')
             
+            # Input validation
+            if not username or len(username.strip()) < 3:
+                flash('Username must be at least 3 characters long.', 'danger')
+                return render_template('register.html')
+            
+            if not email or '@' not in email:
+                flash('Please enter a valid email address.', 'danger')
+                return render_template('register.html')
+            
+            if not password or len(password) < 6:
+                flash('Password must be at least 6 characters long.', 'danger')
+                return render_template('register.html')
+            
+            # Sanitize inputs
+            username = username.strip()
+            email = email.strip().lower()
+            
             # Check if username or email already exists
             existing_user = mongo.db.users.find_one({"$or": [{"username": username}, {"email": email}]})
             if existing_user:
@@ -262,36 +284,53 @@ def register():
                     flash('Username already exists. Please choose a different username.', 'danger')
                 if existing_user.get('email') == email:
                     flash('Email already exists. Please use a different email.', 'danger')
-                return redirect(url_for('register'))
-            elif username and email and password:
-                # Handle profile picture upload
-                profile_picture = None
-                if 'profile_picture' in request.files:
-                    file = request.files['profile_picture']
-                    if file.filename != '':
-                        profile_picture = photos.save(file)
-                
-                hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-                new_user = {
-                    "username": username, 
-                    "email": email,
-                    "password": hashed_password, 
-                    "role": role,
-                    "profile_picture": profile_picture,
-                    "created_at": datetime.now()
-                }
-                mongo.db.users.insert_one(new_user)
-                flash('Registration successful! Please log in.', 'success')
-                return redirect(url_for('login'))
-            else:
-                flash('Username, email and password are required.', 'danger')
+                return render_template('register.html')
+            
+            # Hash password and create user
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            new_user = {
+                "username": username, 
+                "email": email,
+                "password": hashed_password, 
+                "role": role,
+                "profile_picture": None,  # Will be added if uploaded
+                "created_at": datetime.now()
+            }
+            
+            # Handle profile picture upload
+            if 'profile_picture' in request.files:
+                file = request.files['profile_picture']
+                if file and file.filename != '':
+                    # Validate file type
+                    if file.filename.rsplit('.', 1)[1].lower() in ['jpg', 'jpeg', 'png', 'gif']:
+                        new_user["profile_picture"] = photos.save(file)
+                    else:
+                        flash('Invalid file type. Please upload an image file (jpg, jpeg, png, gif).', 'danger')
+                        
+            result = mongo.db.users.insert_one(new_user)
+            app.logger.info(f"New user registered: {username} with ID: {result.inserted_id}")
+            
+            # Check if this should be the first admin user
+            upgrade_first_user_to_admin()
+            
+            flash('Registration successful! Please log in.', 'success')
+            return redirect(url_for('login'))
+            
         except Exception as e:
             flash(f'Registration failed: {str(e)}', 'danger')
             app.logger.error(f'Registration error: {str(e)}')
+            return render_template('register.html')
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def login():
+    # Check rate limit
+    if request.endpoint == 'login' and request.method == 'POST':
+        if hasattr(request, 'is_rate_limited') and request.is_rate_limited:
+            app.logger.warning(f"Rate limit exceeded for IP: {get_remote_address()}")
+            flash('Too many login attempts. Please try again later.', 'danger')
+            return render_template('login.html')
     if mongo is None:
         flash('Database connection error. Please try again later.', 'danger')
         return render_template('login.html')
@@ -300,14 +339,26 @@ def login():
         try:
             username = request.form.get('username')
             password = request.form.get('password')
+            
+            # Input validation
+            if not username or len(username.strip()) < 1:
+                flash('Username is required.', 'danger')
+                return render_template('login.html')
+            
+            if not password or len(password) < 1:
+                flash('Password is required.', 'danger')
+                return render_template('login.html')
+            
+            # Sanitize inputs
+            username = username.strip()
+            
             user = mongo.db.users.find_one({"username": username})
             
-            # Debug print to help troubleshoot
-            print(f"Login attempt: username={username}")
-            print(f"User found: {user is not None}")
+            # Log login attempt for debugging (without sensitive data)
+            app.logger.info(f"Login attempt for username: {username}")
             
             if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
-                print(f"login: username={username}, user={user}")  # Debugging statement
+                app.logger.info(f"Successful login for user: {username}")
                 user_obj = User(user)
                 login_user(user_obj)
                 
@@ -319,63 +370,14 @@ def login():
                     return redirect(url_for('dashboard'))
             else:
                 flash('Login Unsuccessful. Please check username and password', 'danger')
-                print("Login failed - invalid credentials")
+                app.logger.warning(f"Failed login attempt for username: {username}")
         except Exception as e:
             flash(f'Login error: {str(e)}', 'danger')
-            print(f"Login exception: {e}")
+            app.logger.error(f"Login error: {str(e)}")
     return render_template('login.html')
 
-@app.route('/create_admin_now')
-def create_admin_now():
-    """Emergency admin creation route"""
-    if mongo is None:
-        return "Database connection error"
-    
-    admin_username = 'admin'
-    admin_password = 'admin123'  # More secure password
-    admin_role = 'Admin'
-    
-    try:
-        # Delete existing admin if any
-        mongo.db.users.delete_many({"username": admin_username})
-        # Also delete existing second admin if any
-        mongo.db.users.delete_many({"username": 'admin2nd'})
-        
-        # Create new primary admin
-        hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt())
-        admin_user = {
-            "username": admin_username,
-            "email": "alzheimer085@gmail.com",
-            "password": hashed_password,
-            "role": admin_role,
-            "created_at": datetime.now()
-        }
-        result = mongo.db.users.insert_one(admin_user)
-        
-        # Create new secondary admin
-        admin2_password = 'Admin2nd'
-        hashed_password2 = bcrypt.hashpw(admin2_password.encode('utf-8'), bcrypt.gensalt())
-        admin2_user = {
-            "username": 'admin2nd',
-            "email": "admin2@rgcacs.edu",
-            "password": hashed_password2,
-            "role": admin_role,
-            "created_at": datetime.now()
-        }
-        result2 = mongo.db.users.insert_one(admin2_user)
-        
-        return f"""<h2>Admin Accounts Created Successfully!</h2>
-        <p><strong>Primary Username:</strong> {admin_username}</p>
-        <p><strong>Primary Password:</strong> {admin_password}</p>
-        <p><strong>Secondary Username:</strong> admin2nd</p>
-        <p><strong>Secondary Password:</strong> Admin2nd</p>
-        <p><strong>Role:</strong> {admin_role}</p>
-        <p><a href="{url_for('login')}">Go to Login Page</a></p>
-        <p><a href="{url_for('home')}">Go to Home Page</a></p>
-        <style>body{{font-family: Arial, sans-serif; padding: 20px; background: #f0f8ff;}}</style>
-        """
-    except Exception as e:
-        return f"Error creating admin: {str(e)}"
+# Removed insecure emergency admin creation route
+# This route posed a security risk with hardcoded credentials
 
 @app.route('/logout')
 @login_required
@@ -388,23 +390,38 @@ def logout():
 def update_password():
     if current_user.is_authenticated:
         user = mongo.db.users.find_one({'username':current_user.username})
-        print(user)
+        app.logger.debug(f"Loaded user data for: {current_user.username}")
         if request.method == 'POST':
             old_password = request.form['old_password']
+            new_password = request.form['new_password']
+            confirm_new_password = request.form['confirm_new_password']
+            
+            # Input validation
+            if not old_password or len(old_password) < 1:
+                flash('Old password is required.', 'danger')
+                return render_template('change_password.html')
+            
+            if not new_password or len(new_password) < 6:
+                flash('New password must be at least 6 characters long.', 'danger')
+                return render_template('change_password.html')
+            
+            if new_password != confirm_new_password:
+                flash('New password and confirmation do not match.', 'danger')
+                return render_template('change_password.html')
+            
             if bcrypt.checkpw(old_password.encode('utf-8'), user['password']):
-                new_password = request.form['new_password']
-
                 if bcrypt.checkpw(new_password.encode('utf-8'), user['password']):
                     flash('New password cannot be the same as the old password.', 'danger')
-                    return redirect(url_for('update_password'))
+                    return render_template('change_password.html')
 
                 hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
                 mongo.db.users.update_one({"_id": user["_id"]}, {"$set": {"password":hashed_password}})
+                app.logger.info(f"Password updated for user: {current_user.username}")
                 flash('Password updated successfully!', 'success')
                 return redirect(url_for('logout'))
             else:       
                 flash('Old password is incorrect.', 'danger')
-                return redirect(url_for('update_password'))
+                return render_template('change_password.html')
         return render_template('change_password.html')
     else:
         return redirect(url_for('index'))
@@ -1520,11 +1537,16 @@ def export_data(data_type):
     csv_data = output.getvalue()
     output.close()
     
-    return Response(
-        csv_data,
-        mimetype='text/csv',
-        headers={"Content-Disposition": f"attachment;filename={data_type}.csv"}
-    )
+    try:
+        return Response(
+            csv_data,
+            mimetype='text/csv',
+            headers={"Content-Disposition": f"attachment;filename={data_type}.csv"}
+        )
+    except Exception as e:
+        app.logger.error(f'Export error: {str(e)}')
+        flash('Error exporting data. Please try again.', 'danger')
+        return redirect(url_for('analytics_dashboard'))
 
 # Chat routes
 @app.route('/chat')
@@ -1793,6 +1815,8 @@ def logo_demo():
 
 if __name__ == '__main__':
     create_admin_user()
+    # Check and upgrade first user to admin if needed
+    upgrade_first_user_to_admin()
     app.secret_key = os.urandom(24)
     # Suppress the development server warning
     import logging
