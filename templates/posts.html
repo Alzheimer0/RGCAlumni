@@ -10,9 +10,6 @@
         <div class="col-md-8">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2><i class="fas fa-edit text-primary"></i> RGCACS Alumni Posts</h2>
-                <a href="{{ url_for('create_post') }}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Share Your Story
-                </a>
             </div>
 
             {% if posts %}
@@ -55,10 +52,7 @@
                 <div class="text-center py-5">
                     <i class="fas fa-edit fa-3x text-muted mb-3"></i>
                     <h4 class="text-muted">No posts yet</h4>
-                    <p class="text-muted">Be the first to create a post!</p>
-                    <a href="{{ url_for('create_post') }}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Create Your First Post
-                    </a>
+                    <p class="text-muted">Be the first to share a post!</p>
                 </div>
             {% endif %}
         </div>
