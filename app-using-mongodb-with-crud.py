@@ -1626,10 +1626,5 @@ if __name__ == '__main__':
     import logging
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
-    
-    # Add CRUD operations
-    from chat_crud_extensions import add_chat_crud_operations
-    add_chat_crud_operations(socketio, mongo)
-    
     # Run with use_reloader=False to avoid Windows socket issues
     socketio.run(app, host='0.0.0.0', port=5000, debug=True, use_reloader=False)
