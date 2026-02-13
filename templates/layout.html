@@ -63,7 +63,7 @@
                                 <li><a class="dropdown-item" href="{{ url_for('messages') }}"><i class="fas fa-envelope icon"></i> Messages</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('list_mentorships') }}"><i class="fas fa-user-graduate icon"></i> Mentorships</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('global_search') }}"><i class="fas fa-search icon"></i> Search</a></li>
-                                {% if current_user.is_admin() %}
+                                {% if current_user.is_authenticated and current_user.is_admin() %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ url_for('admin_dashboard') }}"><i class="fas fa-user-shield icon"></i> Admin Panel</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('analytics_dashboard') }}"><i class="fas fa-chart-bar icon"></i> Analytics</a></li>

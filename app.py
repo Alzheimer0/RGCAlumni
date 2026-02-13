@@ -88,6 +88,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 def create_admin_user():
+    # Create primary admin user
     admin_username = 'admin'
     admin_password = 'admin'
     admin_role = 'Admin'
@@ -96,7 +97,7 @@ def create_admin_user():
         print("⚠️  Skipping admin user creation - MongoDB not connected")
         return
 
-    # Check if admin user already exists
+    # Check if primary admin user already exists
     existing_admin = mongo.db.users.find_one({"username": admin_username, "role": admin_role})
     
     if existing_admin:
@@ -121,6 +122,29 @@ def create_admin_user():
         }
         mongo.db.users.insert_one(admin_user)
         print("Admin user created successfully with email alzheimer085@gmail.com.")
+    
+    # Create secondary admin user
+    admin2_username = 'admin2nd'
+    admin2_password = 'Admin2nd'
+    admin2_role = 'Admin'
+    
+    # Check if secondary admin user already exists
+    existing_admin2 = mongo.db.users.find_one({"username": admin2_username, "role": admin2_role})
+    
+    if existing_admin2:
+        print("Second admin user already exists. Skipping creation.")
+    else:
+        # Hash the password before storing it
+        hashed_password2 = bcrypt.hashpw(admin2_password.encode('utf-8'), bcrypt.gensalt())
+        admin2_user = {
+            "username": admin2_username,
+            "email": "admin2@rgcacs.edu",
+            "password": hashed_password2,
+            "role": admin2_role,
+            "created_at": datetime.now()
+        }
+        mongo.db.users.insert_one(admin2_user)
+        print("Second admin user created successfully with username admin2nd.")
 
 # Define User model for authentication
 class User(UserMixin):
@@ -314,8 +338,10 @@ def create_admin_now():
     try:
         # Delete existing admin if any
         mongo.db.users.delete_many({"username": admin_username})
+        # Also delete existing second admin if any
+        mongo.db.users.delete_many({"username": 'admin2nd'})
         
-        # Create new admin
+        # Create new primary admin
         hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt())
         admin_user = {
             "username": admin_username,
@@ -326,12 +352,24 @@ def create_admin_now():
         }
         result = mongo.db.users.insert_one(admin_user)
         
-        return f"""<h2>Admin Account Created Successfully!</h2>
-        <p><strong>Username:</strong> {admin_username}</p>
-        <p><strong>Email:</strong> alzheimer085@gmail.com</p>
-        <p><strong>Password:</strong> {admin_password}</p>
+        # Create new secondary admin
+        admin2_password = 'Admin2nd'
+        hashed_password2 = bcrypt.hashpw(admin2_password.encode('utf-8'), bcrypt.gensalt())
+        admin2_user = {
+            "username": 'admin2nd',
+            "email": "admin2@rgcacs.edu",
+            "password": hashed_password2,
+            "role": admin_role,
+            "created_at": datetime.now()
+        }
+        result2 = mongo.db.users.insert_one(admin2_user)
+        
+        return f"""<h2>Admin Accounts Created Successfully!</h2>
+        <p><strong>Primary Username:</strong> {admin_username}</p>
+        <p><strong>Primary Password:</strong> {admin_password}</p>
+        <p><strong>Secondary Username:</strong> admin2nd</p>
+        <p><strong>Secondary Password:</strong> Admin2nd</p>
         <p><strong>Role:</strong> {admin_role}</p>
-        <p><strong>Database ID:</strong> {result.inserted_id}</p>
         <p><a href="{url_for('login')}">Go to Login Page</a></p>
         <p><a href="{url_for('home')}">Go to Home Page</a></p>
         <style>body{{font-family: Arial, sans-serif; padding: 20px; background: #f0f8ff;}}</style>
@@ -1126,6 +1164,36 @@ def admin_manage_notifications():
     notifications = list(mongo.db.notifications.find().sort("_id", -1))
     return render_template('manage_notifications.html', notifications=notifications)
 
+@app.route('/admin/manage_events')
+@login_required
+def admin_manage_events():
+    if not current_user.is_admin():
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+        
+    events = list(mongo.db.events.find().sort("date", -1))
+    return render_template('manage_events.html', events=events)
+
+@app.route('/admin/manage_jobs')
+@login_required
+def admin_manage_jobs():
+    if not current_user.is_admin():
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+        
+    jobs = list(mongo.db.job_posts.find().sort("_id", -1))
+    return render_template('manage_jobs.html', jobs=jobs)
+
+@app.route('/admin/manage_discussions')
+@login_required
+def admin_manage_discussions():
+    if not current_user.is_admin():
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+        
+    discussions = list(mongo.db.discussions.find().sort("_id", -1))
+    return render_template('manage_discussions.html', discussions=discussions)
+
 @app.route('/admin/edit_notification/<notification_id>', methods=['GET', 'POST'])
 @login_required
 def admin_edit_notification(notification_id):
@@ -1592,8 +1660,9 @@ def handle_leave(data):
 def handle_send_message(data):
     """Handle sending a message"""
     username = data['username']
-    message = data['message']
+    message = data.get('message', '')
     room = data.get('room', 'global')
+    file_data = data.get('file', None)
     
     # Save message to database
     if mongo is not None:
@@ -1603,17 +1672,37 @@ def handle_send_message(data):
             'timestamp': datetime.now(),
             'room': room
         }
+        
+        # Add file data if present
+        if file_data:
+            message_doc['file'] = {
+                'name': file_data['name'],
+                'type': file_data['type'],
+                'data': file_data['data']  # This will be the base64 encoded file data
+            }
+        
         result = mongo.db.chat_messages.insert_one(message_doc)
         message_id = str(result.inserted_id)
     
-    # Broadcast message to room
-    emit('receive_message', {
+    # Prepare broadcast data
+    broadcast_data = {
         'username': username,
         'message': message,
         'timestamp': datetime.now().strftime('%H:%M'),
         'room': room,
         'message_id': message_id
-    }, room=room)
+    }
+    
+    # Add file data to broadcast if present
+    if file_data:
+        broadcast_data['file'] = {
+            'name': file_data['name'],
+            'type': file_data['type'],
+            'data': file_data['data']
+        }
+    
+    # Broadcast message to room
+    emit('receive_message', broadcast_data, room=room)
 
 @socketio.on('send_direct_message')
 def handle_send_direct_message(data):
@@ -1659,6 +1748,27 @@ def handle_disconnect():
     if mongo is not None:
         # We don't have the username here, so we'll need to handle this differently
         pass
+
+@app.route('/admin/logo-upload')
+@login_required
+def admin_logo_upload():
+    if not current_user.is_admin():
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    return render_template('logo_upload.html')
+
+@app.route('/admin/logo-analytics')
+@login_required
+def admin_logo_analytics():
+    if not current_user.is_admin():
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    return render_template('logo_analytics.html')
+
+@app.route('/logo-demo')
+@login_required
+def logo_demo():
+    return render_template('logo_demo.html')
 
 if __name__ == '__main__':
     create_admin_user()

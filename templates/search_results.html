@@ -28,7 +28,7 @@
                                     <option value="discussions" {% if search_type == 'discussions' %}selected{% endif %}>Discussions</option>
                                     <option value="jobs" {% if search_type == 'jobs' %}selected{% endif %}>Jobs</option>
                                     <option value="mentorships" {% if search_type == 'mentorships' %}selected{% endif %}>Mentorships</option>
-                                    {% if current_user.is_admin() %}
+                                    {% if current_user.is_authenticated and current_user.is_admin() %}
                                     <option value="users" {% if search_type == 'users' %}selected{% endif %}>Users</option>
                                     {% endif %}
                                 </select>
@@ -159,7 +159,7 @@
         {% endif %}
 
         <!-- Users Results (Admin Only) -->
-        {% if current_user.is_admin() and results.users %}
+        {% if current_user.is_authenticated and current_user.is_admin() and results.users %}
         <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header">

@@ -140,17 +140,17 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a href="{{ url_for('admin_create_event') if current_user.is_admin() else url_for('list_events') }}" class="btn btn-primary">
-                            <i class="fas fa-calendar-plus"></i> {% if current_user.is_admin() %}Create{% else %}View{% endif %} Events
+                        <a href="{{ url_for('admin_create_event') if (current_user.is_authenticated and current_user.is_admin()) else url_for('list_events') }}" class="btn btn-primary">
+                            <i class="fas fa-calendar-plus"></i> {% if current_user.is_authenticated and current_user.is_admin() %}Create{% else %}View{% endif %} Events
                         </a>
-                        <a href="{{ url_for('admin_create_discussion') if current_user.is_admin() else url_for('create_discussion') }}" class="btn btn-success">
-                            <i class="fas fa-comment-medical"></i> {% if current_user.is_admin() %}Manage{% else %}Create{% endif %} Discussions
+                        <a href="{{ url_for('admin_create_discussion') if (current_user.is_authenticated and current_user.is_admin()) else url_for('create_discussion') }}" class="btn btn-success">
+                            <i class="fas fa-comment-medical"></i> {% if current_user.is_authenticated and current_user.is_admin() %}Manage{% else %}Create{% endif %} Discussions
                         </a>
-                        <a href="{{ url_for('admin_create_job') if current_user.is_admin() else url_for('list_jobs') }}" class="btn btn-info">
-                            <i class="fas fa-briefcase"></i> {% if current_user.is_admin() %}Post{% else %}View{% endif %} Jobs
+                        <a href="{{ url_for('admin_create_job') if (current_user.is_authenticated and current_user.is_admin()) else url_for('list_jobs') }}" class="btn btn-info">
+                            <i class="fas fa-briefcase"></i> {% if current_user.is_authenticated and current_user.is_admin() %}Post{% else %}View{% endif %} Jobs
                         </a>
-                        <a href="{{ url_for('admin_create_mentorship') if current_user.is_admin() else url_for('list_mentorships') }}" class="btn btn-warning">
-                            <i class="fas fa-user-graduate"></i> {% if current_user.is_admin() %}Create{% else %}View{% endif %} Mentorships
+                        <a href="{{ url_for('admin_create_mentorship') if (current_user.is_authenticated and current_user.is_admin()) else url_for('list_mentorships') }}" class="btn btn-warning">
+                            <i class="fas fa-user-graduate"></i> {% if current_user.is_authenticated and current_user.is_admin() %}Create{% else %}View{% endif %} Mentorships
                         </a>
                         <a href="{{ url_for('create_post') }}" class="btn btn-secondary">
                             <i class="fas fa-edit"></i> Create Post

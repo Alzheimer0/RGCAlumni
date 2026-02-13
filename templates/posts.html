@@ -33,7 +33,7 @@
                                 </a>
                                 <i class="fas fa-clock ml-2"></i> {{ post.created_at.strftime('%B %d, %Y at %I:%M %p') }}
                             </small>
-                            {% if post.user_id == current_user.id or current_user.is_admin() %}
+                            {% if post.user_id == current_user.id or (current_user.is_authenticated and current_user.is_admin()) %}
                             <div class="btn-group" role="group">
                                 <a href="{{ url_for('edit_post', post_id=post._id) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-edit"></i> Edit
