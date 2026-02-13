@@ -27,24 +27,30 @@ app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Secret key for session management
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'fallback-secret-key-for-development')
 
 # Database configuration
-app.config["MONGO_URI"] = os.getenv('MONGO_URI')
-try:
-    mongo = PyMongo(app)
-    # Simple connection test - try to access database
-    if mongo.db is not None:
-        # Try to list collections as a simple connectivity test
-        _ = list(mongo.db.list_collection_names())
-        print("✅ MongoDB connection successful!")
-    else:
-        raise Exception("MongoDB client is None")
-except Exception as e:
-    print(f"⚠️  MongoDB connection failed: {e}")
-    print("📝 To fix this, install MongoDB or use MongoDB Atlas")
-    print("   Local MongoDB: https://www.mongodb.com/try/download/community")
-    print("   Or use MongoDB Atlas (cloud): https://www.mongodb.com/atlas")
+mongo_uri = os.getenv('MONGO_URI')
+if mongo_uri:
+    app.config["MONGO_URI"] = mongo_uri
+    try:
+        mongo = PyMongo(app)
+        # Simple connection test - try to access database
+        if mongo.db is not None:
+            # Try to list collections as a simple connectivity test
+            _ = list(mongo.db.list_collection_names())
+            print("✅ MongoDB connection successful!")
+        else:
+            raise Exception("MongoDB client is None")
+    except Exception as e:
+        print(f"⚠️  MongoDB connection failed: {e}")
+        print("📝 To fix this, install MongoDB or use MongoDB Atlas")
+        print("   Local MongoDB: https://www.mongodb.com/try/download/community")
+        print("   Or use MongoDB Atlas (cloud): https://www.mongodb.com/atlas")
+        mongo = None
+else:
+    print("⚠️  MONGO_URI not set in environment variables")
+    print("📝 Please set MONGO_URI in your .env file")
     mongo = None
 
 # Upload configuration
@@ -58,11 +64,23 @@ photos = UploadSet('photos', IMAGES)
 configure_uploads(app, photos)
 
 # Mail configuration
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
-app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))
-app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS') == 'True'
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+mail_server = os.getenv('MAIL_SERVER')
+mail_port = os.getenv('MAIL_PORT')
+if mail_server and mail_port:
+    app.config['MAIL_SERVER'] = mail_server
+    app.config['MAIL_PORT'] = int(mail_port)
+    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS') == 'True'
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+else:
+    print("⚠️  Mail configuration not set in environment variables")
+    print("📝 Please set MAIL_SERVER and MAIL_PORT in your .env file")
+    # Set default values to prevent crashes
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_PORT'] = 587
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_USERNAME'] = ''
+    app.config['MAIL_PASSWORD'] = ''
 
 mail = Mail(app)
 login_manager = LoginManager()
@@ -186,11 +204,13 @@ def dashboard():
             user_jobs = list(mongo.db.job_posts.find({"posted_by": current_user.username}))
             user_mentorships = list(mongo.db.mentorships.find({"posted_by": current_user.username}))
             user_events = list(mongo.db.events.find({"posted_by": current_user.username}))
+            user_discussions = list(mongo.db.discussions.find({"author": current_user.username}).sort("_id", -1).limit(5))
         
         return render_template('dashboard.html', notifications=notifications, user=current_user, 
                              alumni=alumni, upcoming_events=upcoming_events, 
                              recent_discussions=recent_discussions, user_jobs=user_jobs, 
-                             user_mentorships=user_mentorships, user_events=user_events)
+                             user_mentorships=user_mentorships, user_events=user_events, 
+                             user_discussions=user_discussions)
     except Exception as e:
         app.logger.error(f'Dashboard error: {str(e)}')
         flash('Error loading dashboard. Please try again.', 'danger')
@@ -694,7 +714,10 @@ def admin_delete_event(event_id):
 @app.route('/discussions')
 def list_discussions():
     discussions = list(mongo.db.discussions.find().sort("_id", -1))
-    return render_template('discussions.html', discussions=discussions)
+    user_discussions = []
+    if current_user.is_authenticated:
+        user_discussions = list(mongo.db.discussions.find({"author": current_user.username}).sort("_id", -1).limit(5))
+    return render_template('discussions.html', discussions=discussions, user_discussions=user_discussions)
 
 @app.route('/discussions/<discussion_id>')
 def view_discussion(discussion_id):
@@ -806,6 +829,81 @@ def add_reply(discussion_id):
         flash('Reply content cannot be empty.', 'danger')
         
     return redirect(url_for('view_discussion', discussion_id=discussion_id))
+
+@app.route('/create_discussion', methods=['GET', 'POST'])
+@login_required
+def create_discussion():
+    if request.method == 'POST':
+        topic = request.form.get('topic')
+        content = request.form.get('content')
+        category = request.form.get('category')
+        
+        discussion = {
+            "topic": topic,
+            "content": content,
+            "author": current_user.username,
+            "category": category,
+            "created_at": datetime.now()
+        }
+        
+        mongo.db.discussions.insert_one(discussion)
+        flash('Discussion created successfully!', 'success')
+        return redirect(url_for('list_discussions'))
+        
+    return render_template('create_discussion.html')
+
+@app.route('/edit_discussion/<discussion_id>', methods=['GET', 'POST'])
+@login_required
+def edit_discussion(discussion_id):
+    discussion = mongo.db.discussions.find_one({"_id": ObjectId(discussion_id)})
+    if not discussion:
+        flash('Discussion not found.', 'danger')
+        return redirect(url_for('list_discussions'))
+    
+    # Check if user owns this discussion
+    if discussion.get('author') != current_user.username and not current_user.is_admin():
+        flash('You do not have permission to edit this discussion.', 'danger')
+        return redirect(url_for('list_discussions'))
+    
+    if request.method == 'POST':
+        topic = request.form.get('topic')
+        content = request.form.get('content')
+        category = request.form.get('category')
+        
+        mongo.db.discussions.update_one(
+            {"_id": ObjectId(discussion_id)},
+            {"$set": {
+                "topic": topic,
+                "content": content,
+                "category": category,
+                "updated_at": datetime.now()
+            }}
+        )
+        
+        flash('Discussion updated successfully!', 'success')
+        return redirect(url_for('view_discussion', discussion_id=discussion_id))
+        
+    return render_template('edit_discussion.html', discussion=discussion)
+
+@app.route('/delete_discussion/<discussion_id>')
+@login_required
+def delete_discussion(discussion_id):
+    discussion = mongo.db.discussions.find_one({"_id": ObjectId(discussion_id)})
+    if not discussion:
+        flash('Discussion not found.', 'danger')
+        return redirect(url_for('list_discussions'))
+    
+    # Check if user owns this discussion or is admin
+    if discussion.get('author') != current_user.username and not current_user.is_admin():
+        flash('You do not have permission to delete this discussion.', 'danger')
+        return redirect(url_for('list_discussions'))
+    
+    # Delete discussion and its replies
+    mongo.db.discussions.delete_one({"_id": ObjectId(discussion_id)})
+    mongo.db.replies.delete_many({"discussion_id": str(discussion_id)})
+    
+    flash('Discussion deleted successfully!', 'success')
+    return redirect(url_for('list_discussions'))
 
 # Job routes
 @app.route('/jobs')

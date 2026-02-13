@@ -12,6 +12,10 @@
                     <input type="text" class="form-control" id="topic" name="topic" value="{{ discussion.topic }}" required>
                 </div>
                 <div class="mb-3">
+                    <label for="category" class="form-label">Category</label>
+                    <input type="text" class="form-control" id="category" name="category" value="{{ discussion.category }}" required>
+                </div>
+                <div class="mb-3">
                     <label for="content" class="form-label">Content</label>
                     <textarea class="form-control" id="content" name="content" required>{{ discussion.content }}</textarea>
                 </div>

@@ -143,8 +143,8 @@
                         <a href="{{ url_for('admin_create_event') if current_user.is_admin() else url_for('list_events') }}" class="btn btn-primary">
                             <i class="fas fa-calendar-plus"></i> {% if current_user.is_admin() %}Create{% else %}View{% endif %} Events
                         </a>
-                        <a href="{{ url_for('admin_create_discussion') if current_user.is_admin() else url_for('list_discussions') }}" class="btn btn-success">
-                            <i class="fas fa-comment-medical"></i> {% if current_user.is_admin() %}Create{% else %}View{% endif %} Discussions
+                        <a href="{{ url_for('admin_create_discussion') if current_user.is_admin() else url_for('create_discussion') }}" class="btn btn-success">
+                            <i class="fas fa-comment-medical"></i> {% if current_user.is_admin() %}Manage{% else %}Create{% endif %} Discussions
                         </a>
                         <a href="{{ url_for('admin_create_job') if current_user.is_admin() else url_for('list_jobs') }}" class="btn btn-info">
                             <i class="fas fa-briefcase"></i> {% if current_user.is_admin() %}Post{% else %}View{% endif %} Jobs

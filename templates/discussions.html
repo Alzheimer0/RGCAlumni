@@ -5,7 +5,7 @@
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="fw-bold"><i class="fas fa-comments icon"></i> DISCUSSIONS</h1>
-        <a tabindex="0" href="{{ url_for('admin_create_discussion') }}" class="btn btn-primary">Create New Discussion</a>
+        <a tabindex="0" href="{{ url_for('create_discussion') }}" class="btn btn-primary">Create New Discussion</a>
     </div>
 
     <!-- User Discussions Section -->
@@ -22,8 +22,8 @@
                 </div>
                 <div>
                     <a tabindex="0" href="{{ url_for('view_discussion', discussion_id=discussion._id) }}" class="btn btn-primary btn-sm me-2">View</a>
-                    <a tabindex="0" href="{{ url_for('admin_edit_discussion', discussion_id=discussion._id) }}" class="btn btn-warning btn-sm me-2">Edit</a>
-                    <a tabindex="0" href="{{ url_for('admin_delete_discussion', discussion_id=discussion._id) }}" class="btn btn-danger btn-sm me-2" onclick="return confirmDelete()">Delete</a>
+                    <a tabindex="0" href="{{ url_for('edit_discussion', discussion_id=discussion._id) }}" class="btn btn-warning btn-sm me-2">Edit</a>
+                    <a tabindex="0" href="{{ url_for('delete_discussion', discussion_id=discussion._id) }}" class="btn btn-danger btn-sm me-2" onclick="return confirmDelete()">Delete</a>
                 </div>
             </li>
             {% endfor %}
