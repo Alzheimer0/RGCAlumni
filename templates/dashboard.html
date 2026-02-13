@@ -4,33 +4,54 @@
 
 {% block content %}
 <div class="container-fluid mt-4">
-    <div class="row">
+    <!-- Dashboard Header -->
+    <div class="row mb-4">
         <div class="col-12">
-            <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
-            <p class="text-muted">Welcome back, {{ current_user.username }}!</p>
+            <div class="jumbotron bg-light rounded-lg p-4">
+                <div class="d-flex align-items-center">
+                    <div class="mr-3">
+                        <i class="fas fa-tachometer-alt fa-2x text-primary"></i>
+                    </div>
+                    <div>
+                        <h2 class="mb-1">Dashboard</h2>
+                        <p class="text-muted mb-0">Welcome back, <strong>{{ current_user.username }}</strong>!</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
+    <!-- Notifications Section -->
     {% if notifications %}
-    <div class="row">
+    <div class="row mb-4">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="fas fa-bell"></i> Recent Notifications</h5>
-                </div>
+            <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
-                    <div class="list-group">
-                        {% for notification in notifications[:5] %}
-                        <div class="list-group-item">
-                            <div class="d-flex justify-content-between">
-                                <p class="mb-1">{{ notification.message }}</p>
-                                <small class="text-muted">{{ notification.created_at.strftime('%Y-%m-%d %H:%M') if notification.created_at else '' }}</small>
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                <i class="fas fa-bell mr-2"></i>Recent Notifications
                             </div>
-                            <div class="d-flex justify-content-end">
-                                <a href="{{ url_for('mark_as_read', notification_id=notification._id) }}" class="btn btn-sm btn-outline-primary">Mark as Read</a>
+                            <div class="list-group list-group-flush mt-3">
+                                {% for notification in notifications[:5] %}
+                                <div class="list-group-item px-0 py-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <p class="mb-1 font-weight-medium">{{ notification.message }}</p>
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock mr-1"></i>
+                                                {{ notification.created_at.strftime('%Y-%m-%d %H:%M') if notification.created_at else '' }}
+                                            </small>
+                                        </div>
+                                        <a href="{{ url_for('mark_as_read', notification_id=notification._id) }}" 
+                                           class="btn btn-sm btn-outline-primary ml-2">
+                                            Mark as Read
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endfor %}
                             </div>
                         </div>
-                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -38,94 +59,144 @@
     </div>
     {% endif %}
     
-    <div class="row mt-4">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-user"></i> Your Profile</h5>
+    <!-- Main Dashboard Content -->
+    <div class="row">
+        <!-- Profile Section -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-user mr-2"></i>Your Profile
+                    </h6>
+                    {% if alumni %}
+                    <a href="{{ url_for('edit_profile', alumni_id=alumni._id) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-edit mr-1"></i>Edit Profile
+                    </a>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     {% if alumni %}
                     <div class="row">
-                        <div class="col-md-8">
-                            <h5>{{ alumni.name }}</h5>
-                            <p><strong>Bio:</strong> {{ alumni.bio }}</p>
-                            <p><strong>Graduation Year:</strong> {{ alumni.graduation_year }}</p>
-                            <p><strong>Industry:</strong> {{ alumni.industry }}</p>
+                        <div class="col-lg-8">
+                            <h5 class="font-weight-bold text-primary mb-3">{{ alumni.name }}</h5>
+                            <div class="mb-3">
+                                <p class="mb-1"><i class="fas fa-quote-left text-muted mr-2"></i><strong>Bio:</strong> {{ alumni.bio }}</p>
+                                <p class="mb-1"><i class="fas fa-graduation-cap text-muted mr-2"></i><strong>Graduation Year:</strong> {{ alumni.graduation_year }}</p>
+                                <p class="mb-1"><i class="fas fa-briefcase text-muted mr-2"></i><strong>Industry:</strong> {{ alumni.industry }}</p>
+                            </div>
                         </div>
-                        <div class="col-md-4 text-center">
+                        <div class="col-lg-4 text-center">
                             {% if user and user.profile_picture %}
                             <img src="{{ url_for('static', filename='uploads/' + user.profile_picture) }}" 
-                                 alt="Profile Picture" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                                 alt="Profile Picture" 
+                                 class="rounded-circle shadow mb-3" 
+                                 style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #e9ecef;">
                             {% else %}
-                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px;">
-                                <i class="fas fa-user fa-2x text-muted"></i>
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow" 
+                                 style="width: 120px; height: 120px; border: 4px solid #e9ecef;">
+                                <i class="fas fa-user fa-3x text-muted"></i>
                             </div>
                             {% endif %}
                         </div>
                     </div>
-                    <div class="mt-3">
-                        <a tabindex="0" href="{{ url_for('edit_profile', alumni_id=alumni._id) }}" class="btn btn-outline-primary mt-3">Edit Profile</a>
-                    </div>
                     {% else %}
-                    <p>You haven't created a profile yet.</p>
-                    <a tabindex="0" href="{{ url_for('create_profile') }}" class="btn btn-outline-primary mt-3">Create Profile</a>
+                    <div class="text-center py-5">
+                        <i class="fas fa-user-circle fa-4x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Profile Found</h5>
+                        <p class="text-muted mb-4">You haven't created a profile yet.</p>
+                        <a href="{{ url_for('create_profile') }}" class="btn btn-primary">
+                            <i class="fas fa-plus mr-2"></i>Create Profile
+                        </a>
+                    </div>
                     {% endif %}
                 </div>
             </div>
             
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header bg-success text-white">
-                            <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Your Events</h5>
-                        </div>
+            <!-- Events and Discussions Row -->
+            <div class="row">
+                <!-- Your Events -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
                         <div class="card-body">
-                            {% if user_events %}
-                            <ul class="list-group">
-                                {% for event in user_events[:3] %}
-                                <li class="list-group-item">
-                                    <h6>{{ event.title }}</h6>
-                                    <p class="mb-1"><strong>Date:</strong> {{ event.date.strftime('%Y-%m-%d') if event.date else '' }}</p>
-                                    <div class="mt-2">
-                                        <a href="{{ url_for('view_event', event_id=event._id) }}" class="btn btn-sm btn-primary">View</a>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        <i class="fas fa-calendar-alt mr-2"></i>Your Events
                                     </div>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                            {% else %}
-                            <p class="text-muted">No events posted yet.</p>
-                            {% endif %}
-                            <div class="mt-3">
-                                <a href="{{ url_for('list_events') }}" class="btn btn-outline-primary">View All Events</a>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800 mt-2">
+                                        {% if user_events %}
+                                        <div class="list-group list-group-flush">
+                                            {% for event in user_events[:3] %}
+                                            <div class="list-group-item px-0 py-2">
+                                                <h6 class="mb-1 font-weight-medium">{{ event.title }}</h6>
+                                                <p class="mb-1 text-muted small">
+                                                    <i class="fas fa-calendar mr-1"></i>
+                                                    {{ event.date.strftime('%Y-%m-%d') if event.date else '' }}
+                                                </p>
+                                                <a href="{{ url_for('view_event', event_id=event._id) }}" 
+                                                   class="btn btn-sm btn-outline-success">
+                                                    View Details
+                                                </a>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% else %}
+                                        <div class="text-center py-3">
+                                            <i class="fas fa-calendar-times text-muted fa-2x mb-2"></i>
+                                            <p class="text-muted mb-0">No events posted yet</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mt-3">
+                                        <a href="{{ url_for('list_events') }}" class="btn btn-sm btn-outline-success btn-block">
+                                            <i class="fas fa-list mr-1"></i>View All Events
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header bg-warning text-white">
-                            <h5 class="mb-0"><i class="fas fa-comments"></i> Your Discussions</h5>
-                        </div>
+                <!-- Your Discussions -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
                         <div class="card-body">
-                            {% if recent_discussions %}
-                            <ul class="list-group">
-                                {% for discussion in recent_discussions[:3] %}
-                                <li class="list-group-item">
-                                    <h6>{{ discussion.topic }}</h6>
-                                    <p class="mb-1"><strong>Category:</strong> {{ discussion.category }}</p>
-                                    <div class="mt-2">
-                                        <a href="{{ url_for('view_discussion', discussion_id=discussion._id) }}" class="btn btn-sm btn-primary">View</a>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        <i class="fas fa-comments mr-2"></i>Your Discussions
                                     </div>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                            {% else %}
-                            <p class="text-muted">No discussions created yet.</p>
-                            {% endif %}
-                            <div class="mt-3">
-                                <a href="{{ url_for('list_discussions') }}" class="btn btn-outline-primary">View All Discussions</a>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800 mt-2">
+                                        {% if recent_discussions %}
+                                        <div class="list-group list-group-flush">
+                                            {% for discussion in recent_discussions[:3] %}
+                                            <div class="list-group-item px-0 py-2">
+                                                <h6 class="mb-1 font-weight-medium">{{ discussion.topic }}</h6>
+                                                <p class="mb-1 text-muted small">
+                                                    <i class="fas fa-tag mr-1"></i>
+                                                    {{ discussion.category }}
+                                                </p>
+                                                <a href="{{ url_for('view_discussion', discussion_id=discussion._id) }}" 
+                                                   class="btn btn-sm btn-outline-warning">
+                                                    View Discussion
+                                                </a>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% else %}
+                                        <div class="text-center py-3">
+                                            <i class="fas fa-comments-slash text-muted fa-2x mb-2"></i>
+                                            <p class="text-muted mb-0">No discussions created yet</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mt-3">
+                                        <a href="{{ url_for('list_discussions') }}" class="btn btn-sm btn-outline-warning btn-block">
+                                            <i class="fas fa-list mr-1"></i>View All Discussions
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -133,51 +204,129 @@
             </div>
         </div>
         
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0"><i class="fas fa-rocket"></i> Quick Actions</h5>
+        <!-- Quick Actions Sidebar -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-rocket mr-2"></i>Quick Actions
+                    </h6>
                 </div>
                 <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="{{ url_for('admin_create_event') if (current_user.is_authenticated and current_user.is_admin()) else url_for('list_events') }}" class="btn btn-primary">
-                            <i class="fas fa-calendar-plus"></i> {% if current_user.is_authenticated and current_user.is_admin() %}Create{% else %}View{% endif %} Events
-                        </a>
-                        <a href="{{ url_for('admin_create_discussion') if (current_user.is_authenticated and current_user.is_admin()) else url_for('create_discussion') }}" class="btn btn-success">
-                            <i class="fas fa-comment-medical"></i> {% if current_user.is_authenticated and current_user.is_admin() %}Manage{% else %}Create{% endif %} Discussions
-                        </a>
-                        <a href="{{ url_for('admin_create_job') if (current_user.is_authenticated and current_user.is_admin()) else url_for('list_jobs') }}" class="btn btn-info">
-                            <i class="fas fa-briefcase"></i> {% if current_user.is_authenticated and current_user.is_admin() %}Post{% else %}View{% endif %} Jobs
-                        </a>
-                        <a href="{{ url_for('admin_create_mentorship') if (current_user.is_authenticated and current_user.is_admin()) else url_for('list_mentorships') }}" class="btn btn-warning">
-                            <i class="fas fa-user-graduate"></i> {% if current_user.is_authenticated and current_user.is_admin() %}Create{% else %}View{% endif %} Mentorships
-                        </a>
-                        <a href="{{ url_for('create_post') }}" class="btn btn-secondary">
-                            <i class="fas fa-edit"></i> Create Post
-                        </a>
-                        <a href="{{ url_for('chat') }}" class="btn btn-dark">
-                            <i class="fas fa-comments"></i> Global Chat
-                        </a>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="list-group">
+                                <a href="{{ url_for('admin_create_event') if (current_user.is_authenticated and current_user.is_admin()) else url_for('list_events') }}" 
+                                   class="list-group-item list-group-item-action d-flex align-items-center py-3">
+                                    <div class="icon-circle bg-primary text-white rounded-circle mr-3">
+                                        <i class="fas fa-calendar-plus"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-weight-bold">
+                                            {% if current_user.is_authenticated and current_user.is_admin() %}Create{% else %}View{% endif %} Events
+                                        </div>
+                                        <div class="small text-muted">Manage upcoming events</div>
+                                    </div>
+                                </a>
+                                <a href="{{ url_for('admin_create_discussion') if (current_user.is_authenticated and current_user.is_admin()) else url_for('create_discussion') }}" 
+                                   class="list-group-item list-group-item-action d-flex align-items-center py-3">
+                                    <div class="icon-circle bg-success text-white rounded-circle mr-3">
+                                        <i class="fas fa-comment-medical"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-weight-bold">
+                                            {% if current_user.is_authenticated and current_user.is_admin() %}Manage{% else %}Create{% endif %} Discussions
+                                        </div>
+                                        <div class="small text-muted">Start new conversations</div>
+                                    </div>
+                                </a>
+                                <a href="{{ url_for('admin_create_job') if (current_user.is_authenticated and current_user.is_admin()) else url_for('list_jobs') }}" 
+                                   class="list-group-item list-group-item-action d-flex align-items-center py-3">
+                                    <div class="icon-circle bg-info text-white rounded-circle mr-3">
+                                        <i class="fas fa-briefcase"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-weight-bold">
+                                            {% if current_user.is_authenticated and current_user.is_admin() %}Post{% else %}View{% endif %} Jobs
+                                        </div>
+                                        <div class="small text-muted">Career opportunities</div>
+                                    </div>
+                                </a>
+                                <a href="{{ url_for('admin_create_mentorship') if (current_user.is_authenticated and current_user.is_admin()) else url_for('list_mentorships') }}" 
+                                   class="list-group-item list-group-item-action d-flex align-items-center py-3">
+                                    <div class="icon-circle bg-warning text-white rounded-circle mr-3">
+                                        <i class="fas fa-user-graduate"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-weight-bold">
+                                            {% if current_user.is_authenticated and current_user.is_admin() %}Create{% else %}View{% endif %} Mentorships
+                                        </div>
+                                        <div class="small text-muted">Mentorship programs</div>
+                                    </div>
+                                </a>
+                                <a href="{{ url_for('create_post') }}" 
+                                   class="list-group-item list-group-item-action d-flex align-items-center py-3">
+                                    <div class="icon-circle bg-secondary text-white rounded-circle mr-3">
+                                        <i class="fas fa-edit"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-weight-bold">Create Post</div>
+                                        <div class="small text-muted">Share your thoughts</div>
+                                    </div>
+                                </a>
+                                <a href="{{ url_for('chat') }}" 
+                                   class="list-group-item list-group-item-action d-flex align-items-center py-3">
+                                    <div class="icon-circle bg-dark text-white rounded-circle mr-3">
+                                        <i class="fas fa-comments"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-weight-bold">Global Chat</div>
+                                        <div class="small text-muted">Connect with alumni</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             
+            <!-- Upcoming Events -->
             {% if upcoming_events %}
-            <div class="card mt-4">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Upcoming Events</h5>
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-calendar-check mr-2"></i>Upcoming Events
+                    </h6>
+                    <a href="{{ url_for('list_events') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-list mr-1"></i>View All
+                    </a>
                 </div>
                 <div class="card-body">
-                    {% for event in upcoming_events[:3] %}
-                    <div class="mb-3 pb-3 border-bottom">
-                        <h6>{{ event.title }}</h6>
-                        <p class="mb-1"><strong>Date:</strong> {{ event.date.strftime('%Y-%m-%d') if event.date else '' }}</p>
-                        <p class="mb-1"><strong>Location:</strong> {{ event.location }}</p>
-                        <a href="{{ url_for('view_event', event_id=event._id) }}" class="btn btn-sm btn-primary">View Details</a>
-                    </div>
-                    {% endfor %}
-                    <div class="text-center">
-                        <a href="{{ url_for('list_events') }}" class="btn btn-outline-primary">View All Events</a>
+                    <div class="list-group list-group-flush">
+                        {% for event in upcoming_events[:3] %}
+                        <div class="list-group-item px-0 py-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="font-weight-bold text-primary mb-2">{{ event.title }}</h6>
+                                    <div class="d-flex flex-wrap gap-2 mb-2">
+                                        <span class="badge badge-light">
+                                            <i class="fas fa-calendar mr-1"></i>
+                                            {{ event.date.strftime('%Y-%m-%d') if event.date else '' }}
+                                        </span>
+                                        <span class="badge badge-light">
+                                            <i class="fas fa-map-marker-alt mr-1"></i>
+                                            {{ event.location }}
+                                        </span>
+                                    </div>
+                                    <p class="text-muted mb-0">{{ event.description[:100] }}{% if event.description|length > 100 %}...{% endif %}</p>
+                                </div>
+                                <a href="{{ url_for('view_event', event_id=event._id) }}" 
+                                   class="btn btn-sm btn-outline-primary ml-2">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>

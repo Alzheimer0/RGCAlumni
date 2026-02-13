@@ -118,23 +118,116 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>       
-    <footer class="footer bg-dark text-white text-center py-4 mt-5">
+    <footer class="footer bg-dark text-white py-4">
         <div class="container">
             <div class="row">
-                <div class="col-md-4 mb-3 mb-md-0">
-                    <h5>Rajiv Gandhi College</h5>
-                    <p class="mb-1">Rajiv Gandhi College of Arts, Commerce & Science</p>
-                    <p class="mb-1">Affiliated to Sant Gadge Baba Amravati University</p>
+                <!-- College Information -->
+                <div class="col-md-4 mb-3">
+                    <div class="footer-brand">
+                        <div class="d-flex align-items-center mb-2">
+                            <img src="{{ url_for('static', filename='images/rgcacs-official-logo.png') }}" 
+                                 alt="RGCACS Logo" 
+                                 class="footer-logo mr-2" 
+                                 style="height: 40px; width: 40px; object-fit: contain;">
+                            <div>
+                                <h6 class="text-white mb-0">Rajiv Gandhi College</h6>
+                                <small class="text-muted">EST. 1985</small>
+                            </div>
+                        </div>
+                        <p class="text-light small mb-1">Rajiv Gandhi College of Arts, Commerce & Science</p>
+                        <p class="text-light small mb-2">Affiliated to Sant Gadge Baba Amravati University</p>
+                        <p class="text-warning font-italic mb-3">"Trust Transforms Life"</p>
+                        
+                        <!-- College Stats -->
+                        <div class="footer-stats d-flex">
+                            <div class="stat-item text-center mr-3">
+                                <div class="stat-number text-primary font-weight-bold">2500+</div>
+                                <div class="stat-label text-light small">Alumni</div>
+                            </div>
+                            <div class="stat-item text-center mr-3">
+                                <div class="stat-number text-success font-weight-bold">35+</div>
+                                <div class="stat-label text-light small">Years</div>
+                            </div>
+                            <div class="stat-item text-center">
+                                <div class="stat-number text-info font-weight-bold">50+</div>
+                                <div class="stat-label text-light small">Programs</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4 mb-3 mb-md-0">
-                    <h5>Contact Information</h5>
-                    <p class="mb-1">Email: <a href="mailto:info@rgccollege.edu" class="text-white">info@rgccollege.edu</a></p>
-                    <p class="mb-1">Phone: +91 12345 67890</p>
+                
+                <!-- Quick Links -->
+                <div class="col-md-2 mb-3">
+                    <h6 class="text-white mb-3">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-1"><a href="{{ url_for('home') }}" class="text-light text-decoration-none">Home</a></li>
+                        <li class="mb-1"><a href="{{ url_for('list_events') }}" class="text-light text-decoration-none">Events</a></li>
+                        <li class="mb-1"><a href="{{ url_for('list_discussions') }}" class="text-light text-decoration-none">Discussions</a></li>
+                        <li class="mb-1"><a href="{{ url_for('list_jobs') }}" class="text-light text-decoration-none">Jobs</a></li>
+                        <li class="mb-1"><a href="{{ url_for('chat') }}" class="text-light text-decoration-none">Chat</a></li>
+                        <li class="mb-1"><a href="{{ url_for('list_posts') }}" class="text-light text-decoration-none">Posts</a></li>
+                        <li class="mb-1"><a href="{{ url_for('list_mentorships') }}" class="text-light text-decoration-none">Mentorships</a></li>
+                    </ul>
                 </div>
-                <div class="col-md-4">
-                    <h5>Connect With Us</h5>
-                    <p class="mb-1">Stay connected with fellow alumni</p>
-                    <p class="mb-0">&copy; 2025 Rajiv Gandhi Alumni Network. All rights reserved.</p>
+                
+                <!-- Contact Information -->
+                <div class="col-md-3 mb-3">
+                    <h6 class="text-white mb-3">Contact Info</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <strong class="text-primary">Email</strong><br>
+                            <a href="mailto:info@rgccollege.edu" class="text-light text-decoration-none">info@rgccollege.edu</a><br>
+                            <a href="mailto:alumni@rgccollege.edu" class="text-light text-decoration-none">alumni@rgccollege.edu</a>
+                        </li>
+                        <li class="mb-2">
+                            <strong class="text-success">Phone</strong><br>
+                            <span class="text-light">+91 12345 67890</span><br>
+                            <span class="text-light">+91 98765 43210</span>
+                        </li>
+                        <li class="mb-2">
+                            <strong class="text-danger">Address</strong><br>
+                            <span class="text-light">Rajiv Gandhi Nagar,<br>Amravati, Maharashtra 444601</span>
+                        </li>
+                        <li class="mb-2">
+                            <strong class="text-info">Office Hours</strong><br>
+                            <span class="text-light">Mon-Fri: 9:00 AM - 5:00 PM</span><br>
+                            <span class="text-light">Sat: 10:00 AM - 2:00 PM</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Connect With Us -->
+                <div class="col-md-3">
+                    <h6 class="text-white mb-3">Connect With Us</h6>
+                    <p class="text-light small mb-3">Stay connected with fellow alumni and never miss important updates.</p>
+                    
+                    <!-- Newsletter Signup -->
+                    <div class="newsletter-signup">
+                        <h6 class="text-white mb-2">Newsletter Signup</h6>
+                        <p class="text-light small mb-2">Get the latest updates and news delivered to your inbox.</p>
+                        <form class="newsletter-form">
+                            <div class="input-group">
+                                <input type="email" class="form-control form-control-sm" placeholder="Your email address" required>
+                                <div class="input-group-append">
+                                    <button class="btn btn-sm btn-primary" type="submit">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="newsletter-confirmation mt-2 text-success small d-none">
+                            <i class="fas fa-check-circle mr-1"></i>Thank you for subscribing!
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer Bottom -->
+            <div class="footer-bottom border-top border-secondary mt-4 pt-3">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <p class="mb-0 text-light">&copy; 2025 Rajiv Gandhi Alumni Network. All rights reserved.</p>
+                    </div>
                 </div>
             </div>
         </div>

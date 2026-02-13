@@ -1,6 +1,9 @@
 // .static/js/scripts.js
 
 document.addEventListener("DOMContentLoaded", function () {
+    // Initialize all UI enhancements
+    initializeUIEnhancements();
+    
     // Profile form validation
     const profileForm = document.querySelector("form.profile-form");
 
@@ -12,27 +15,32 @@ document.addEventListener("DOMContentLoaded", function () {
             const industry = document.getElementById("industry");
             const contactDetails = document.getElementById("contact_details");
 
-            // Simple validation checks
+            // Enhanced validation with visual feedback
+            clearValidationFeedback();
+            
             if (!name.value.trim()) {
                 valid = false;
-                alert("Name is required.");
+                showValidationFeedback(name, "Name is required.", "invalid");
                 name.focus();
             } else if (!graduationYear.value.trim() || isNaN(graduationYear.value) || graduationYear.value < 1900 || graduationYear.value > new Date().getFullYear()) {
                 valid = false;
-                alert("Please enter a valid graduation year.");
+                showValidationFeedback(graduationYear, "Please enter a valid graduation year.", "invalid");
                 graduationYear.focus();
             } else if (!industry.value.trim()) {
                 valid = false;
-                alert("Industry is required.");
+                showValidationFeedback(industry, "Industry is required.", "invalid");
                 industry.focus();
             } else if (!contactDetails.value.trim()) {
                 valid = false;
-                alert("Contact details are required.");
+                showValidationFeedback(contactDetails, "Contact details are required.", "invalid");
                 contactDetails.focus();
             }
 
             if (!valid) {
-                event.preventDefault(); // Prevent form submission if validation fails
+                event.preventDefault();
+                showToast("Please fix the validation errors", "error");
+            } else {
+                showLoadingState(profileForm);
             }
         });
     }
@@ -179,12 +187,28 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    // Hide flash messages after 5 seconds
-    const flashes = document.querySelectorAll(".alert");
+    // Enhanced flash message handling
+    const flashes = document.querySelectorAll(".alert, .flash");
     flashes.forEach(function (alert) {
+        // Add close button
+        if (!alert.querySelector('.alert-close')) {
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'alert-close';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = function() {
+                alert.style.animation = 'fadeOutDown 0.3s ease forwards';
+                setTimeout(() => alert.remove(), 300);
+            };
+            alert.appendChild(closeBtn);
+        }
+        
+        // Auto-hide with animation
         setTimeout(function () {
-            alert.style.display = "none";
-        }, 5000); // 5000 milliseconds = 5 seconds
+            if (alert.parentElement) {
+                alert.style.animation = 'fadeOutDown 0.5s ease forwards';
+                setTimeout(() => alert.remove(), 500);
+            }
+        }, 5000);
     });
 });
 
@@ -201,6 +225,349 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Setup logo error handling
     setupLogoErrorHandling();
+});
+
+// Initialize all UI enhancements
+function initializeUIEnhancements() {
+    setupScrollToTop();
+    setupToasts();
+    setupLoadingStates();
+    setupFormEnhancements();
+    setupAccessibilityFeatures();
+    setupNetworkStatus();
+}
+
+// Scroll to Top functionality
+function setupScrollToTop() {
+    const scrollToTopBtn = document.createElement('button');
+    scrollToTopBtn.className = 'scroll-to-top';
+    scrollToTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+    scrollToTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.body.appendChild(scrollToTopBtn);
+    
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+            scrollToTopBtn.classList.add('visible');
+        } else {
+            scrollToTopBtn.classList.remove('visible');
+        }
+    });
+}
+
+// Toast notification system
+function setupToasts() {
+    const toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container';
+    document.body.appendChild(toastContainer);
+}
+
+function showToast(message, type = 'info', duration = 5000) {
+    const toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type} show`;
+    
+    const iconMap = {
+        success: 'check-circle',
+        error: 'exclamation-circle',
+        warning: 'exclamation-triangle',
+        info: 'info-circle'
+    };
+    
+    toast.innerHTML = `
+        <div class="toast-header">
+            <i class="fas fa-${iconMap[type] || iconMap.info} mr-2"></i>
+            <strong class="toast-title">${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+            <button class="toast-close">&times;</button>
+        </div>
+        <div class="toast-body">${message}</div>
+    `;
+    
+    toast.querySelector('.toast-close').onclick = () => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    };
+    
+    toastContainer.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+// Enhanced loading states
+function setupLoadingStates() {
+    // Form submission loading
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function() {
+            showLoadingState(this);
+        });
+    });
+    
+    // Button loading states
+    document.querySelectorAll('[data-loading]').forEach(button => {
+        button.addEventListener('click', function() {
+            showButtonLoading(this);
+        });
+    });
+}
+
+function showLoadingState(element) {
+    const originalContent = element.innerHTML;
+    element.classList.add('btn-loading');
+    element.disabled = true;
+    
+    // Store original content for later restoration
+    element.dataset.originalContent = originalContent;
+}
+
+function showButtonLoading(button) {
+    const originalText = button.innerHTML;
+    button.classList.add('btn-loading');
+    button.disabled = true;
+    button.dataset.originalText = originalText;
+}
+
+function hideLoadingState(element) {
+    element.classList.remove('btn-loading');
+    element.disabled = false;
+    
+    if (element.dataset.originalContent) {
+        element.innerHTML = element.dataset.originalContent;
+        delete element.dataset.originalContent;
+    }
+}
+
+function hideButtonLoading(button) {
+    button.classList.remove('btn-loading');
+    button.disabled = false;
+    
+    if (button.dataset.originalText) {
+        button.innerHTML = button.dataset.originalText;
+        delete button.dataset.originalText;
+    }
+}
+
+// Enhanced form validation feedback
+function showValidationFeedback(element, message, type) {
+    // Remove existing feedback
+    const existingFeedback = element.parentNode.querySelector('.form-feedback');
+    if (existingFeedback) {
+        existingFeedback.remove();
+    }
+    
+    // Add new feedback
+    const feedback = document.createElement('div');
+    feedback.className = `form-feedback ${type}`;
+    feedback.innerHTML = `<i class="fas fa-${type === 'valid' ? 'check' : 'exclamation-circle'} mr-1"></i>${message}`;
+    element.parentNode.appendChild(feedback);
+    
+    // Add visual state to input
+    element.classList.add(`is-${type}`);
+}
+
+function clearValidationFeedback() {
+    document.querySelectorAll('.form-feedback').forEach(feedback => {
+        feedback.remove();
+    });
+    
+    document.querySelectorAll('input, textarea, select').forEach(element => {
+        element.classList.remove('is-valid', 'is-invalid');
+    });
+}
+
+// Enhanced form interactions
+function setupFormEnhancements() {
+    // Auto-growing textareas
+    document.querySelectorAll('textarea').forEach(textarea => {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    });
+    
+    // Password strength indicator
+    document.querySelectorAll('input[type="password"]').forEach(passwordInput => {
+        passwordInput.addEventListener('input', function() {
+            const strength = calculatePasswordStrength(this.value);
+            updatePasswordStrengthIndicator(this, strength);
+        });
+    });
+}
+
+function calculatePasswordStrength(password) {
+    let strength = 0;
+    if (password.length >= 8) strength += 1;
+    if (/[a-z]/.test(password)) strength += 1;
+    if (/[A-Z]/.test(password)) strength += 1;
+    if (/[0-9]/.test(password)) strength += 1;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+    return strength;
+}
+
+function updatePasswordStrengthIndicator(input, strength) {
+    let indicator = input.parentNode.querySelector('.password-strength');
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.className = 'password-strength';
+        input.parentNode.appendChild(indicator);
+    }
+    
+    const strengthText = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+    const strengthColors = ['#dc3545', '#fd7e14', '#ffc107', '#20c997', '#28a745'];
+    
+    indicator.innerHTML = `
+        <div class="strength-meter">
+            <div class="strength-bar" style="width: ${(strength * 20)}%; background: ${strengthColors[strength - 1] || strengthColors[0]}"></div>
+        </div>
+        <small class="form-text text-muted">${strengthText[strength - 1] || strengthText[0]}</small>
+    `;
+}
+
+// Accessibility enhancements
+function setupAccessibilityFeatures() {
+    // Keyboard navigation improvements
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+            document.body.classList.add('keyboard-navigation');
+        }
+    });
+    
+    document.addEventListener('mousedown', function() {
+        document.body.classList.remove('keyboard-navigation');
+    });
+    
+    // Focus visible enhancement
+    document.querySelectorAll('a, button, input, textarea, select').forEach(element => {
+        element.addEventListener('focus', function() {
+            if (document.body.classList.contains('keyboard-navigation')) {
+                this.classList.add('focus-visible');
+            }
+        });
+        
+        element.addEventListener('blur', function() {
+            this.classList.remove('focus-visible');
+        });
+    });
+}
+
+// Network status monitoring
+function setupNetworkStatus() {
+    const networkStatus = document.createElement('div');
+    networkStatus.className = 'network-status';
+    document.body.appendChild(networkStatus);
+    
+    window.addEventListener('online', function() {
+        networkStatus.classList.remove('offline', 'reconnecting');
+        showToast('You are back online', 'success');
+    });
+    
+    window.addEventListener('offline', function() {
+        networkStatus.classList.add('offline');
+        showToast('You are offline. Some features may not work.', 'warning');
+    });
+}
+
+// File upload enhancements
+function setupFileUpload() {
+    document.querySelectorAll('.file-upload-area').forEach(uploadArea => {
+        const fileInput = uploadArea.querySelector('input[type="file"]');
+        
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function() {
+            this.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (fileInput) {
+                fileInput.files = files;
+                handleFileUpload(files[0]);
+            }
+        });
+    });
+}
+
+function handleFileUpload(file) {
+    if (!file) return;
+    
+    const uploadArea = document.querySelector('.file-upload-area');
+    const progressBar = uploadArea.querySelector('.upload-progress-bar') || 
+                       createProgressBar(uploadArea);
+    
+    // Simulate upload progress
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.random() * 10;
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            showToast('File uploaded successfully!', 'success');
+        }
+        progressBar.style.width = progress + '%';
+    }, 200);
+}
+
+function createProgressBar(container) {
+    const progressContainer = document.createElement('div');
+    progressContainer.className = 'upload-progress';
+    
+    const progressBar = document.createElement('div');
+    progressBar.className = 'upload-progress-bar';
+    
+    progressContainer.appendChild(progressBar);
+    container.appendChild(progressContainer);
+    return progressBar;
+}
+
+// Utility functions
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function throttle(func, limit) {
+    let inThrottle;
+    return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+}
+
+// Initialize on page load
+window.addEventListener('load', function() {
+    setupFileUpload();
+    setupFooterEnhancements();
+    
+    // Hide loading screen
+    const loadingScreen = document.querySelector('.page-loading');
+    if (loadingScreen) {
+        setTimeout(() => {
+            loadingScreen.style.opacity = '0';
+            loadingScreen.style.visibility = 'hidden';
+            setTimeout(() => loadingScreen.remove(), 300);
+        }, 500);
+    }
 });
 
 // Initialize the logo system
@@ -483,5 +850,51 @@ if (typeof window !== 'undefined') {
     });
 }
 
+// Enhanced Footer Functionality
+function setupFooterEnhancements() {
+    setupNewsletterForm();
+}
 
+// Newsletter Form Enhancement
+function setupNewsletterForm() {
+    const newsletterForm = document.querySelector('.newsletter-form');
+    if (!newsletterForm) return;
+    
+    newsletterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const emailInput = this.querySelector('input[type="email"]');
+        const email = emailInput.value.trim();
+        const confirmation = this.querySelector('.newsletter-confirmation');
+        
+        if (!email) {
+            showToast('Please enter your email address', 'error');
+            return;
+        }
+        
+        if (!isValidEmail(email)) {
+            showToast('Please enter a valid email address', 'error');
+            emailInput.focus();
+            return;
+        }
+        
+        // Show success message
+        emailInput.value = '';
+        confirmation.classList.remove('d-none');
+        showToast('Thank you for subscribing to our newsletter!', 'success');
+        
+        // Hide confirmation after 3 seconds
+        setTimeout(() => {
+            confirmation.classList.add('d-none');
+        }, 3000);
+    });
+}
 
+// Email Validation
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Initialize footer enhancements
+setupFooterEnhancements();
