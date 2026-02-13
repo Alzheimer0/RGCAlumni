@@ -1709,7 +1709,8 @@ def handle_send_direct_message(data):
     """Handle sending a direct message"""
     sender = data['sender']
     recipient = data['recipient']
-    message = data['message']
+    message = data.get('message', '')
+    file_data = data.get('file', None)
     
     # Save message to database
     if mongo is not None:
@@ -1720,14 +1721,34 @@ def handle_send_direct_message(data):
             'timestamp': datetime.now(),
             'read': False
         }
+        
+        # Add file data if present
+        if file_data:
+            message_doc['file'] = {
+                'name': file_data['name'],
+                'type': file_data['type'],
+                'data': file_data['data']  # This will be the base64 encoded file data
+            }
+        
         mongo.db.direct_messages.insert_one(message_doc)
     
-    # Emit to recipient if online
-    emit('receive_direct_message', {
+    # Prepare emit data
+    emit_data = {
         'sender': sender,
         'message': message,
         'timestamp': datetime.now().strftime('%H:%M')
-    }, room=recipient)
+    }
+    
+    # Add file data to emit if present
+    if file_data:
+        emit_data['file'] = {
+            'name': file_data['name'],
+            'type': file_data['type'],
+            'data': file_data['data']
+        }
+    
+    # Emit to recipient if online
+    emit('receive_direct_message', emit_data, room=recipient)
 
 @socketio.on('typing')
 def handle_typing(data):
