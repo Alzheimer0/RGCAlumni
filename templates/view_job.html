@@ -28,8 +28,8 @@
         <!-- Edit Button (Visible only if the user posted the job) -->
         {% if job.posted_by == current_user.username %}
         <div class="card-footer d-flex justify-content-end">
-            <a tabindex="0" href="{{ url_for('edit_job', job_id=job._id) }}" class="btn btn-warning mb-2">Edit Job</a>
-            <a tabindex="0" href="{{ url_for('delete_job', job_id=job._id) }}" class="btn btn-danger mb-2" onclick="return confirmDelete()">Delete Job</a>
+            <a tabindex="0" href="{{ url_for('admin_edit_job', job_id=job._id) }}" class="btn btn-warning mb-2">Edit Job</a>
+            <a tabindex="0" href="{{ url_for('admin_delete_job', job_id=job._id) }}" class="btn btn-danger mb-2" onclick="return confirmDelete()">Delete Job</a>
         </div>
         {% endif %}
     </div>

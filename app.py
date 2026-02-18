@@ -706,7 +706,41 @@ def admin_create_event():
         flash('Event created successfully!', 'success')
         return redirect(url_for('list_events'))
         
-    return render_template('create_event.html')
+    return render_template('create_event.html', current_date=datetime.now().strftime('%Y-%m-%d'))
+
+@app.route('/create_event', methods=['GET', 'POST'])
+@login_required
+def create_event():
+    """Allow regular users to create events (non-admin version)"""
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    
+    if request.method == 'POST':
+        title = request.form.get('title')
+        date_str = request.form.get('date')
+        location = request.form.get('location')
+        description = request.form.get('description')
+        
+        # Convert date string to datetime object
+        try:
+            date = datetime.strptime(date_str, '%Y-%m-%d')
+        except ValueError:
+            flash('Invalid date format. Please use YYYY-MM-DD.', 'danger')
+            return redirect(url_for('create_event'))
+        
+        event = {
+            "title": title,
+            "date": date,
+            "location": location,
+            "description": description,
+            "posted_by": current_user.username,
+            "created_at": datetime.now()
+        }
+        
+        mongo.db.events.insert_one(event)
+        flash('Event created successfully!', 'success')
+        return redirect(url_for('list_events'))
+        
+    return render_template('create_event.html', current_date=current_date)
 
 @app.route('/admin/edit_event/<event_id>', methods=['GET', 'POST'])
 @login_required
@@ -1513,7 +1547,7 @@ def delete_post(post_id):
         
     mongo.db.posts.delete_one({"_id": ObjectId(post_id)})
     flash('Post deleted successfully!', 'success')
-    return redirect(url_for('user_posts'))
+    return redirect(url_for('user_posts', username=current_user.username))
 
 # Search functionality
 @app.route('/search')

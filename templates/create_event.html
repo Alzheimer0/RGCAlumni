@@ -13,7 +13,7 @@
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
             <!-- <div class="card shadow-sm p-4"> -->
-                <form action="/create_event" method="post">
+                <form action="{% if current_user.is_authenticated %}{{ url_for('create_event') }}{% else %}/create_event{% endif %}" method="post">
                     <!-- Title Field -->
                     <div class="mb-3">
                         <label class="form-label" for="title">Title:</label>
@@ -23,7 +23,7 @@
                     <!-- Date Field -->
                     <div class="mb-3">
                         <label class="form-label" for="date">Date:</label>
-                        <input class="form-control" tabindex="0" type="date" id="date" name="date" value="{{ current_date }}" required>
+                        <input class="form-control" tabindex="0" type="date" id="date" name="date" value="{% if current_date %}{{ current_date }}{% else %}{{ datetime.now().strftime('%Y-%m-%d') }}{% endif %}" required>
                     </div>
 
                     <!-- Location Field -->
