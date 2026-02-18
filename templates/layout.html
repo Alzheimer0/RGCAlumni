@@ -97,14 +97,16 @@
             </div> -->
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-            <ul class="flashes list-unstyled">
+            <div class="alert-container position-fixed top-0 start-50 translate-middle-x mt-4 z-index-1000" style="z-index: 1050; width: 90%; max-width: 500px;">
                 {% for category, message in messages %}
-                            <li class="alert alert-{{ category }}">
-                                <i  class="fas {{ 'fa-check-circle' if category == 'success' else 'fa-exclamation-circle' }}"></i> {{ message }}
-                            </li>
-                            {% endfor %}
-                        </ul>
-                {% endif %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show shadow-lg mb-2" role="alert">
+                    <i class="fas {{ 'fa-check-circle' if category == 'success' else 'fa-info-circle' if category == 'info' else 'fa-exclamation-circle' }}"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
             {% endwith %}
             {% block content %}{% endblock %}
         </div>

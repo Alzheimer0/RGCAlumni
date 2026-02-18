@@ -765,6 +765,61 @@ def admin_delete_event(event_id):
     flash('Event deleted successfully!', 'success')
     return redirect(url_for('list_events'))
 
+@app.route('/rsvp_event/<event_id>')
+@login_required
+def rsvp_event(event_id):
+    event = mongo.db.events.find_one({"_id": ObjectId(event_id)})
+    if not event:
+        flash('Event not found.', 'danger')
+        return redirect(url_for('list_events'))
+    
+    # Add user to the RSVP list for this event
+    rsvp_data = {
+        'event_id': event_id,
+        'user_id': current_user.id,
+        'username': current_user.username,
+        'timestamp': datetime.now(),
+        'status': 'confirmed'  # Default RSVP status
+    }
+    
+    # Check if user has already RSVP'd
+    existing_rsvp = mongo.db.event_rsvps.find_one({
+        'event_id': event_id,
+        'user_id': current_user.id
+    })
+    
+    if existing_rsvp:
+        # Update existing RSVP
+        mongo.db.event_rsvps.update_one(
+            {'_id': existing_rsvp['_id']},
+            {'$set': {'status': 'confirmed', 'timestamp': datetime.now()}}
+        )
+        flash('Your RSVP has been updated!', 'success')
+    else:
+        # Create new RSVP
+        mongo.db.event_rsvps.insert_one(rsvp_data)
+        flash('You have successfully RSVP\'d to this event!', 'success')
+    
+    return redirect(url_for('view_event', event_id=event_id))
+
+@app.route('/admin/delete_events', methods=['POST'])
+@login_required
+def admin_delete_events():
+    if not current_user.is_admin():
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    
+    event_ids = request.form.getlist('event_ids')
+    if event_ids:
+        # Convert string IDs to ObjectId and delete
+        object_ids = [ObjectId(id_str) for id_str in event_ids]
+        result = mongo.db.events.delete_many({"_id": {"$in": object_ids}})
+        flash(f'{result.deleted_count} events deleted successfully!', 'success')
+    else:
+        flash('No events selected for deletion.', 'warning')
+    
+    return redirect(url_for('manage_events'))
+
 # Discussion routes
 @app.route('/discussions')
 def list_discussions():
@@ -861,6 +916,29 @@ def admin_delete_discussion(discussion_id):
     
     flash('Discussion deleted successfully!', 'success')
     return redirect(url_for('list_discussions'))
+
+@app.route('/admin/delete_discussions', methods=['POST'])
+@login_required
+def admin_delete_discussions():
+    if not current_user.is_admin():
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    
+    discussion_ids = request.form.getlist('discussion_ids')
+    if discussion_ids:
+        # Convert string IDs to ObjectId and delete discussions and their replies
+        object_ids = [ObjectId(id_str) for id_str in discussion_ids]
+        result = mongo.db.discussions.delete_many({"_id": {"$in": object_ids}})
+        
+        # Also delete all replies for these discussions
+        for discussion_id in discussion_ids:
+            mongo.db.replies.delete_many({"discussion_id": discussion_id})
+        
+        flash(f'{result.deleted_count} discussions deleted successfully!', 'success')
+    else:
+        flash('No discussions selected for deletion.', 'warning')
+    
+    return redirect(url_for('manage_discussions'))
 
 @app.route('/discussions/<discussion_id>/reply', methods=['POST'])
 @login_required
@@ -1339,11 +1417,18 @@ def view_post(post_id):
         return redirect(url_for('list_posts'))
     return render_template('view_post.html', post=post)
 
-@app.route('/user_posts')
+@app.route('/user_posts/<username>')
 @login_required
-def user_posts():
-    posts = list(mongo.db.posts.find({"author": current_user.username}).sort("_id", -1))
-    return render_template('user_posts.html', posts=posts)
+def user_posts(username):
+    # Get the user object
+    user = mongo.db.users.find_one({"username": username})
+    if not user:
+        flash('User not found.', 'error')
+        return redirect(url_for('home'))
+    
+    # Get posts by the specific user
+    posts = list(mongo.db.posts.find({"author": username}).sort("_id", -1))
+    return render_template('user_posts.html', posts=posts, user=user)
 
 @app.route('/create_post', methods=['GET', 'POST'])
 @login_required

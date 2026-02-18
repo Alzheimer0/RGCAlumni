@@ -27,13 +27,19 @@
         <!-- Edit Button (Visible only if the user posted the event) -->
         {% if event.posted_by == current_user.username %}
         <div class="card-footer d-flex justify-content-end">
-            <a tabindex="0" href="{{ url_for('edit_event', event_id=event._id) }}" class="btn btn-warning mb-3">Edit Event</a>
-            <a tabindex="0" href="{{ url_for('delete_event', event_id=event._id) }}" class="btn btn-danger mb-3" onclick="return confirmDelete()">Delete Event</a>
+            <a tabindex="0" href="{{ url_for('admin_edit_event', event_id=event._id) }}" class="btn btn-warning mb-3">Edit Event</a>
+            <a tabindex="0" href="{{ url_for('admin_delete_event', event_id=event._id) }}" class="btn btn-danger mb-3" onclick="return confirmDelete()">Delete Event</a>
         </div>
         {% endif %}
         
-        <!-- Optional RSVP Button (Currently Commented) -->
-        <!-- <a tabindex="0" href="{{ url_for('rsvp_event', event_id=event._id) }}" class="btn btn-primary">RSVP</a> -->
+        <!-- RSVP Button (Visible to authenticated users who haven't posted the event) -->
+        {% if current_user.is_authenticated and event.posted_by != current_user.username %}
+        <div class="mt-3">
+            <a tabindex="0" href="{{ url_for('rsvp_event', event_id=event._id) }}" class="btn btn-primary">
+                <i class="fas fa-calendar-check"></i> RSVP to Event
+            </a>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

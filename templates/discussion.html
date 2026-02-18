@@ -27,7 +27,7 @@
 
     <!-- Post a Reply Section -->
     <h3 class="text-success mb-3">Post a Reply</h3>
-    <form method="post" class="shadow-sm p-4 rounded bg-light">
+    <form method="post" action="{{ url_for('add_reply', discussion_id=discussion._id) }}" class="shadow-sm p-4 rounded bg-light">
         <div class="mb-3">
             <label class="form-label" for="content">Reply:</label>
             <textarea class="form-control" tabindex="0" id="content" name="content" placeholder="Enter your reply here..." rows="4" required></textarea>
